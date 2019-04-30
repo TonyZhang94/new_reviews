@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% block header %}
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="container-fluid col-md-12" id="attrs">
+            <div class="col-md-12">
+                {% if not is_global %}
+                    <div class="col-md-4 mycard-head">
+                        <h3 style="margin: 0">
+                            PCID:{{ pcid }} CID:{{ cid }}
+                        </h3>
+                    </div>
+                {% endif %}
+                <div class="col-md-8" id="input-data">
+                    <div class="col-md-3"><input type="text" class="form-control" placeholder="{{ left_name }}"
+                                                 id="left-word" value="{{ left }}"></div>
+                    <div class="col-md-3"><input type="text" class="form-control" placeholder="{{ right_name }}"
+                                                 id="right-word" value="{{ right }}"></div>
+                    <div class="col-md-1">
+                        <button class="btn btn-default" id="show-data">查询</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12" id="property-list">
+                <div class="tab-pane fade in active">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>{{ left_name }}</th>
+                            <th>{{ right_name }}</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody id="table_content">
+                        <!--用于js创建元素-->
+                        <tr style="display: none" id="templateRow">
+                            <th name="left" old=""></th>
+                            <th><input name="right" style="width: 100px;" type="text" placeholder=""
+                                       value="" old=""></th>
+                            <th>
+                                <button type="button" class="btn btn-warning reverse_row">交换</button>
+                            </th>
+                            <th>
+                                <button type="button" class="btn btn-primary save_row">保存</button>
+                            </th>
+                            <th>
+                                <button type="button" class="btn btn-danger delete_row">删除</button>
+                            </th>
+                            {#                            <th>#}
+                            {#                                <button type="button" class="btn btn-warning hide_row">不显示</button>#}
+                            {#                            </th>#}
+                        </tr>
+                        {% for item in clusters %}
+                            <tr>
+                                <th name="left" old="{{ item.left }}">{{ item.left }}</th>
+                                <th><input name="right" style="width: 100px;" type="text" placeholder=""
+                                           value="{{ item.right }}" old="{{ item.right }}"></th>
+                                <th>
+                                    <button type="button" class="btn btn-warning reverse_row">交换</button>
+                                </th>
+                                <th>
+                                    <button type="button" class="btn btn-primary save_row">保存</button>
+                                </th>
+                                <th>
+                                    <button type="button" class="btn btn-danger delete_row">删除</button>
+                                </th>
+                                {#                                <th>#}
+                                {#                                    <button type="button" class="btn btn-warning hide_row">不显示</button>#}
+                                {#                                </th>#}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-12">
+                    <div class="btn-toolbar" id="pages" role="toolbar" aria-label="pages">
+                        {% for i in pages %}
+                            <div class="btn-group" role="group" aria-label="page">
+                                <button type="button"
+                                        class="btn {% if i == page %}btn-primary{% else %}btn-default{% endif %} {% if i == page %}current{% endif %}"
+                                        name="page">{{ i }}</button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-12" style="margin-top: 2%">
+                    <button class="btn btn-danger" id="submit-all">提交本页</button>
+                </div>
+                <div class="col-md-12" id="alert">
+                    <div class="alert alert-info" role="alert" style="display: none;" id="doing_message">
+                        正在提交，不要关闭页面...
+                    </div>
+                    <div class="alert alert-success" role="alert" style="display: none;" id="done_message">恭喜你，已经完成提交！
+                    </div>
+                    <div class="alert alert-warning" role="alert" style="display: none;" id="error_message"></div>
+                </div>
+            </div>
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel">提醒</h4>
+                        </div>
+                        <div class="modal-body">
+                            你确定提交修改内容?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button type="button" class="btn btn-primary" id="do_action">继续</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block afterbody %}
+    <style>
+        ul {
+            list-style-type: none;
+            margin-bottom: 0;
+        }
+
+        li {
+            display: inline-block;
+        }
+
+        input.labelauty + label {
+            display: inline-block;
+        }
+
+        th {
+            text-align: center;
+        }
+    </style>
+    <script type="text/javascript" src="{% static "js/plugin/jquery-labelauty.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/lexicon.js" %}?v=20190116"></script>
+    <script type="application/javascript">
+        var leftName = '{{ left_name }}';
+        var rightName = '{{ right_name }}';
+        var urlRoot = '{{ url_root }}';
+        var pcid = "{{ pcid|default:'' }}";
+        var cid = "{{ cid|default:'' }}";
+    </script>
+{% endblock afterbody %}

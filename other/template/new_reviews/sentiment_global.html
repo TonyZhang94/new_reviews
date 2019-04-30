@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% block header %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/reviews.css" %}">
+    <style>
+        ul {
+            list-style-type: none;
+            margin-bottom: 0;
+        }
+
+        li {
+            display: inline-block;
+        }
+
+        input.labelauty + label {
+            display: inline-block;
+        }
+
+        th {
+            text-align: center;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="container-fluid col-md-12" id="ax">
+            <div class="col-md-12">
+                <h2>全局情感词库维护</h2>
+            </div>
+            <div class="col-md-12" id="input-data">
+                <div class="col-md-3"><input type="text" class="form-control" placeholder="情感词"
+                                             id="opinion-word" value="{{ opinion }}"></div>
+                <div class="col-md-3"><input type="text" class="form-control" placeholder="替换词"
+                                             id="merge-word" value="{{ merge }}"></div>
+                <div class="col-md-1">
+                    <button class="btn btn-default" id="show-data">查询</button>
+                </div>
+            </div>
+            <div class="col-md-12" id="property-list">
+                <div class="tab-pane fade in active">
+                    <table class="table table-striped" id="table-content">
+                        <thead>
+                        <tr>
+                            <th>情感词</th>
+                            <th>正负向</th>
+                            <th>替换词</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in result %}
+                            <tr opinion="{{ item.opinion }}" merge="{{ item.merge }}"
+                                grade="{{ item.grade }}">
+                                <th name="opinion">{{ item.opinion }}</th>
+                                <th>
+                                    <div name="grade">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="direct-{{ item.target }}-{{ item.opinion }}"
+                                                   value="1" {% if item.grade == 1 %}checked{% endif %}>正面
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="direct-{{ item.target }}-{{ item.opinion }}"
+                                                   value="-1" {% if item.grade == -1 %}checked{% endif %}>负面
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="direct-{{ item.target }}-{{ item.opinion }}"
+                                                   value="0" {% if item.grade == 0 %}checked{% endif %}>中立
+                                        </label>
+                                    </div>
+                                </th>
+                                <th><input name="des" style="width: 100px;" type="text" value="{{ item.merge }}"></th>
+                                <th>
+                                    <button type="button" class="btn btn-warning hide_row">不显示</button>
+                                </th>
+                                <th>
+                                    <button type="button" class="btn btn-warning reverse_row">交换</button>
+                                </th>
+                                <th>
+                                    <button type="button" class="btn btn-primary save_row">保存</button>
+                                </th>
+                                <th>
+                                    <button type="button" class="btn btn-danger delete_row">删除</button>
+                                </th>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="btn-toolbar" id="pages" role="toolbar" aria-label="pages">
+                    {% for i in pages %}
+                        <div class="btn-group" role="group" aria-label="page">
+                            <button type="button"
+                                    class="btn {% if i == page %}btn-primary{% else %}btn-default{% endif %} {% if i == page %}current{% endif %}"
+                                    name="page">{{ i }}</button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-md-12" style="margin-top: 2%">
+                <button class="btn btn-danger" id="submit-all">提交本页</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block afterbody %}
+    <script type="text/javascript" src="{% static "js/plugin/jquery-labelauty.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/sentiment_global.js" %}?v=201901141647"></script>
+{% endblock afterbody %}

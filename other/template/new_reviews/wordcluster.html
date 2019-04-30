@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% block header %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/wordclusters.css" %}">
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="container-fluid col-md-12" id="attrs" pcid="{{result.pcid}}" cid="{{result.cid}}" {% if edit %}op="edit"{% endif %}>
+                <div class="col-md-12">
+                    <h2>聚类结果检查及合并<small style="margin-left: 10px;">PCID:{{result.pcid}} CID:{{result.cid}}</small></h2>
+                </div>
+                <div class="col-md-12" style="background-color: beige;margin-bottom: 15px;">
+                    <h4>说明</h4>
+                    <p>1. 相近词之间必须用 /符号，回车，或者空格 隔开</p>
+                    <p>2. 点击删除按钮，删除每行聚类后，相近词会在右侧保留框内出现。注意，替换词不会被添加到保留框内。</p>
+                    <p>3. 在同一个相近词聚类中词语不能重复出现，同一个词不能出现在两个不同的聚类中。</p>
+                </div>
+               <div class="col-md-10" id="property-list">
+               		<div class="col-md-12">
+       					<label for="cluster_alpha">聚类参数（0-1之间的浮点数，值越大类内词相似度越大) </label>
+				    	<input type="text"  id="cluster_alpha" placeholder="(例如:0.85)" value="{{result.cluster_alpha}}">
+				    	<button type="button" class="btn btn-primary" id="clusterAgain">重新聚类</button>
+               		</div>
+                    <div class="col-md-12">
+                        <button type="button" class="btn btn-primary" id="add_row">新增一行</button>
+                    </div>
+                    <div class="tab-pane fade in active">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>相近词</th>
+                                <th style="width: 100px;">替换词</th>
+                                <th style="width: 60px;">删除</th>
+                            </tr>
+                            </thead>
+                            <tbody id="table_content">
+                                {% for item in result.clusters %}
+                                <tr>
+                                    <th><textarea>{{ item.src }}</textarea></th>
+                                    <th><input name="des" style="width: 100px;" type="text" placeholder="" value="{{ item.des }}"></th>
+                                    <th><button type="button" class="btn btn-danger delete_row">删除</button></th>
+                                    <th><input name="synonym_global" type="checkbox" class="btn btn-info" />全局近义词</th>
+                                 </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="alert alert-warning" role="alert" id="tip_message">请再确定一次修改内容，保证没有错别字/多余的行，点击提交按钮！</div>
+                        <div class="alert alert-info " role="alert" style="display: none;" id="doing_message">正在提交，不要关闭页面...</div>
+                        <div class="alert alert-success" role="alert" style="display: none;" id="done_message">恭喜你，已经完成提交！</div>
+                        <button type="button" class="btn btn-warning" id="submit">提交</button>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <h2>其他词汇</h2>
+                    <textarea id="single_cluster" rows="10">{{result.single_cluster}}</textarea>
+                </div>
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">提醒</h4>
+                      </div>
+                      <div class="modal-body">
+                        你确定提交修改内容?
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" id="do_action">继续</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal fade" id="goback" tabindex="-1" role="dialog" aria-labelledby="nextpage">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">提醒</h4>
+                      </div>
+                      <div class="modal-body">
+                        恭喜你，已经完成整个品类！(点击继续将跳转到文本分析主页)?
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" id="text_home" >继续</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+        </div>
+    </div>
+{% endblock %}
+{% block afterbody %}
+<style>
+ul { list-style-type: none;margin-bottom: 0px;}
+li { display: inline-block;}
+input.labelauty + label { display: inline-block; }
+th{text-align: center;}
+</style>
+<script type="text/javascript" src="{% static "js/plugin/jquery-labelauty.js" %}"></script>
+<script type="text/javascript" src="{% static "js/words_cluster.js" %}"></script>
+{% endblock afterbody %}

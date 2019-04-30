@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% block header %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/magic-check.css" %}">
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="container-fluid col-md-12" id="attrs" pcid="{{ result.pcid }}" cid="{{ result.cid }}">
+            <div class="col-md-12">
+                <h2>业务人员 属性标注
+                    <small style="margin-left: 10px;">PCID:{{ result.pcid }} CID:{{ result.cid }}</small>
+                </h2>
+            </div>
+            <div class="col-md-12">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        {% for i in  pg_nav.indexlist %}
+                            <li {% ifequal i pg_nav.curindex %}class="active"{% endifequal %}><a
+                                    href="./?pcid={{ result.pcid }}&cid={{ result.cid }}&pgindex={{ i }}&sort={{ sort }}&desc={{ desc }}">{{ i }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </nav>
+            </div>
+            <div class="col-md-12" id="property-list">
+                <ul class="nav nav-tabs nav-justified" id="myTab">
+                    <li role='presentation' class="active"><a href="#re" data-toggle="tab">产品相关</a></li>
+                    <li role='presentation'><a href="#irre" data-toggle="tab">产品不相关</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade in active" id="re">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr id="re_bar_head">
+                                <th>#</th>
+                                <th {% if sort == 'target' %}desc="{{ desc }}"{% endif %}>target{% if sort == 'target' %}<i class="glyphicon glyphicon-arrow-{% if desc == 'true' %}down{% else %}up{% endif %}"></i>{% endif %}</th>
+                                <th {% if sort == 'freq' %}desc="{{ desc }}"{% endif %}>词频{% if sort == 'freq' %}<i class="glyphicon glyphicon-arrow-{% if desc == 'true' %}down{% else %}up{% endif %}"></i>{% endif %}</th>
+                                <th></th>
+                                <th>是否设为全局属性</th>
+                                <th>忽略</th>
+                                <th>使用场景</th>
+                                <th>适用人群</th>
+                                <th>价格</th>
+                                <th>服务</th>
+                                <th>物流</th>
+                                <th>品牌</th>
+                                <th>功能</th>
+                                <th>质量</th>
+                                <th>款式</th>
+                                <th>活动</th>
+                                <th>无效</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for item in result.ir %}
+                                <tr>
+                                    <th itemid="{{ item.id }}">{{ item.No }}</th>
+                                    <th>{{ item.target }}</th>
+                                    <th>{{ item.frequency }}</th>
+                                    <th><a tabindex="0" class="btn btn-primary" role="button" data-toggle="popover"
+                                           data-trigger="focus" title="样例句子"
+                                           data-content="{% for sen in item.sentences %} [ {{ sen }} ] {% endfor %}">点击详情</a>
+                                    </th>
+                                    <th><input name="is-global" type="checkbox" class="btn btn-info"/></th>
+                                    <th><input {% ifequal item.top1class "ignore" %}checked="true"{% endifequal %}
+                                    			class="magic-radio" type="radio" name="radio_{{ item.id }}" tag="ignore"
+                                               id="radio_{{ item.id }}_100"><label for="radio_{{ item.id }}_100"></label>
+                                    </th>
+                                    <th><input {% ifequal item.top1class "使用场景" %}checked="true"{% endifequal %}
+                                               class="magic-radio" type="radio" name="radio_{{ item.id }}"
+                                               id="radio_{{ item.id }}_1" tag="使用场景"><label
+                                            for="radio_{{ item.id }}_1"></label></th>
+                                    <th><input {% ifequal item.top1class "适用人群" %}checked="true"{% endifequal %}
+                                               class="magic-radio" type="radio" name="radio_{{ item.id }}"
+                                               id="radio_{{ item.id }}_2" tag="适用人群"><label
+                                            for="radio_{{ item.id }}_2"></label></th>
+                                    <th><input {% ifequal item.top1class "价格" %}checked="true"{% endifequal %}
+                                               class="magic-radio" type="radio" name="radio_{{ item.id }}"
+                                               id="radio_{{ item.id }}_3" tag="价格"><label
+                                            for="radio_{{ item.id }}_3"></label></th>
+                                    <th><input {% ifequal item.top1class "服务" %}checked="true"{% endifequal %}
+                                               class="magic-radio" type="radio" name="radio_{{ item.id }}"
+                                               id="radio_{{ item.id }}_4" tag="服务"><label
+                                            for="radio_{{ item.id }}_4"></label></th>
+                                    <th><input {% ifequal item.top1class "物流" %}checked="true"{% endifequal %}
+                                               class="magic-radio" type="radio" name="radio_{{ item.id }}"
+                                               id="radio_{{ item.id }}_5" tag="物流"><label
+                                            for="radio_{{ item.id }}_5"></label></th>
+                                    <th><input {% ifequal item.top1class "品牌" %}checked="true"{% endifequal %}
+                                               class="magic-radio" type="radio" name="radio_{{ item.id }}"
+                                               id="radio_{{ item.id }}_6" tag="品牌"><label
+                                            for="radio_{{ item.id }}_6"></label></th>
+                                    <th><input {% ifequal item.top1class "功能" %}checked="true"{% endifequal %}
+                                               class="magic-radio" type="radio" name="radio_{{ item.id }}"
+                                               id="radio_{{ item.id }}_7" tag="功能"><label
+                                            for="radio_{{ item.id }}_7"></label></th>
+                                    <th><input {% ifequal item.top1class "质量" %}checked="true"{% endifequal %}
+                                               class="magic-radio" type="radio" name="radio_{{ item.id }}"
+                                               id="radio_{{ item.id }}_8" tag="质量"><label
+                                            for="radio_{{ item.id }}_8"></label></th>
+                                    <th><input {% ifequal item.top1class "款式" %}checked="true"{% endifequal %}
+                                               class="magic-radio" type="radio" name="radio_{{ item.id }}"
+                                               id="radio_{{ item.id }}_9" tag="款式"><label
+                                            for="radio_{{ item.id }}_9"></label></th>
+                                    <th><input {% ifequal item.top1class "活动" %}checked="true"{% endifequal %}
+                                               class="magic-radio" type="radio" name="radio_{{ item.id }}"
+                                               id="radio_{{ item.id }}_10" tag="活动"><label
+                                            for="radio_{{ item.id }}_10"></label></th>
+                                    <th><input {% ifequal item.top1class "delete" %}checked="true"{% endifequal %}
+                                    			class="magic-radio" type="radio" name="radio_{{ item.id }}" tag="delete"
+                                               id="radio_{{ item.id }}_0"><label for="radio_{{ item.id }}_0"></label>
+                                    </th>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane fade" id="irre">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr id="irre_bar_head">
+                                <th>#</th>
+                                <th {% if sort == 'target' %}desc="{{ desc }}"{% endif %}>target{% if sort == 'target' %}<i class="glyphicon glyphicon-arrow-{% if desc == 'true' %}down{% else %}up{% endif %}"></i>{% endif %}</th>
+                                <th {% if sort == 'freq' %}desc="{{ desc }}"{% endif %}>词频{% if sort == 'freq' %}<i class="glyphicon glyphicon-arrow-{% if desc == 'true' %}down{% else %}up{% endif %}"></i>{% endif %}</th>
+                                <th></th>
+                                <th>是否设为全局属性</th>
+                                <th>忽略</th>
+                                <th>使用场景</th>
+                                <th>适用人群</th>
+                                <th>价格</th>
+                                <th>服务</th>
+                                <th>物流</th>
+                                <th>品牌</th>
+                                <th>功能</th>
+                                <th>质量</th>
+                                <th>款式</th>
+                                <th>活动</th>
+                                <th>无效</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for item in result.irre %}
+                                <tr>
+                                    <th itemid="{{ item.id }}">{{ item.No }}</th>
+                                    <th>{{ item.target }}</th>
+                                    <th>{{ item.frequency }}</th>
+                                    <th><a tabindex="0" class="btn btn-primary" role="button" data-toggle="popover"
+                                           data-trigger="focus" title="样例句子"
+                                           data-content="{% for sen in item.sentences %} [ {{ sen }} ] {% endfor %}">点击详情</a>
+                                    </th>
+                                    <th><input name="is-global" type="checkbox" class="btn btn-info"/></th>
+                                    <th><input {% ifequal item.top1class "ignore" %}checked="true"{% endifequal %}
+                                    			class="magic-radio" type="radio" name="radio_{{ item.id }}" tag="ignore"
+                                               id="radio_{{ item.id }}_100"><label for="radio_{{ item.id }}_100"></label>
+                                    </th>
+                                    <th><input {% ifequal item.top1class "使用场景" %}checked="true"{% endifequal %}
+                                               class="magic-radio" type="radio" name="radio_{{ item.id }}"
+                                               id="radio_{{ item.id }}_1" tag="使用场景"><label
+                                            for="radio_{{ item.id }}_1"></label></th>
+                                    <th><input {% ifequal item.top1class "适用人群" %}checked="true"{% endifequal %}
+                                               class="magic-radio" type="radio" name="radio_{{ item.id }}"
+                                               id="radio_{{ item.id }}_2" tag="适用人群"><label
+                                            for="radio_{{ item.id }}_2"></label></th>
+                                    <th><input {% ifequal item.top1class "价格" %}checked="true"{% endifequal %}
+                                               class="magic-radio" type="radio" name="radio_{{ item.id }}"
+                                               id="radio_{{ item.id }}_3" tag="价格"><label
+                                            for="radio_{{ item.id }}_3"></label></th>
+                                    <th><input {% ifequal item.top1class "服务" %}checked="true"{% endifequal %}
+                                               class="magic-radio" type="radio" name="radio_{{ item.id }}"
+                                               id="radio_{{ item.id }}_4" tag="服务"><label
+                                            for="radio_{{ item.id }}_4"></label></th>
+                                    <th><input {% ifequal item.top1class "物流" %}checked="true"{% endifequal %}
+                                               class="magic-radio" type="radio" name="radio_{{ item.id }}"
+                                               id="radio_{{ item.id }}_5" tag="物流"><label
+                                            for="radio_{{ item.id }}_5"></label></th>
+                                    <th><input {% ifequal item.top1class "品牌" %}checked="true"{% endifequal %}
+                                               class="magic-radio" type="radio" name="radio_{{ item.id }}"
+                                               id="radio_{{ item.id }}_6" tag="品牌"><label
+                                            for="radio_{{ item.id }}_6"></label></th>
+                                    <th><input {% ifequal item.top1class "功能" %}checked="true"{% endifequal %}
+                                               class="magic-radio" type="radio" name="radio_{{ item.id }}"
+                                               id="radio_{{ item.id }}_7" tag="功能"><label
+                                            for="radio_{{ item.id }}_7"></label></th>
+                                    <th><input {% ifequal item.top1class "质量" %}checked="true"{% endifequal %}
+                                               class="magic-radio" type="radio" name="radio_{{ item.id }}"
+                                               id="radio_{{ item.id }}_8" tag="质量"><label
+                                            for="radio_{{ item.id }}_8"></label></th>
+                                    <th><input {% ifequal item.top1class "款式" %}checked="true"{% endifequal %}
+                                               class="magic-radio" type="radio" name="radio_{{ item.id }}"
+                                               id="radio_{{ item.id }}_9" tag="款式"><label
+                                            for="radio_{{ item.id }}_9"></label></th>
+                                    <th><input {% ifequal item.top1class "活动" %}checked="true"{% endifequal %}
+                                               class="magic-radio" type="radio" name="radio_{{ item.id }}"
+                                               id="radio_{{ item.id }}_10" tag="活动"><label
+                                            for="radio_{{ item.id }}_10"></label></th>
+                                    <th><input {% ifequal item.top1class "delete" %}checked="true"{% endifequal %}
+                                    			class="magic-radio" type="radio" name="radio_{{ item.id }}" tag="delete"
+                                               id="radio_{{ item.id }}_0"><label for="radio_{{ item.id }}_0"></label>
+                                    </th>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="alert alert-warning" role="alert" id="tip_message">
+                        请在确认全部属性（包括产品相关和产品不相关两类）完成标注或把未确认的标注成忽略后，点击提交按钮！
+                    </div>
+                    <div class="alert alert-info " role="alert" style="display: none;" id="doing_message">
+                        正在提交，不要关闭页面...
+                    </div>
+                    <div class="alert alert-success" role="alert" style="display: none;" id="done_message">恭喜你，已经完成提交！
+                    </div>
+                    <button type="button" class="btn btn-warning" id="submit">提交</button>
+                </div>
+            </div>
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel">提醒</h4>
+                        </div>
+                        <div class="modal-body">
+                            你确定提交全部属性标注（包括产品相关和产品不相关两类）?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button type="button" class="btn btn-primary" id="do_action">继续</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="nextpage" tabindex="-1" role="dialog" aria-labelledby="nextpage">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">提醒</h4>
+                        </div>
+                        <div class="modal-body">
+                            恭喜你，已经完成提交！你继续进行属性标注吗(点击继续,刷新页面将跳转到第一页)?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button type="button" class="btn btn-primary" id="firstpg">继续</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="goback" tabindex="-1" role="dialog" aria-labelledby="nextpage">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">提醒</h4>
+                        </div>
+                        <div class="modal-body">
+                            恭喜你，已经完成整个品类！(点击继续将跳转到文本分析主页)?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button type="button" class="btn btn-primary" id="text_home">继续</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block afterbody %}
+    <style>
+        li {
+            display: inline-block;
+        }
+
+        th {
+            text-align: center;
+        }
+
+        #irre_bar_head, #re_bar_head {
+            background-color: #f5be71;
+        }
+    </style>
+    <script type="text/javascript" src="{% static "js/plugin/eleFixed.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/tagscheck_version2.js" %}?v=201902121902"></script>
+{% endblock afterbody %}

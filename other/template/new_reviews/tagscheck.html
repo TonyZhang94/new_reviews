@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% block header %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/reviews.css" %}">
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="container-fluid col-md-12" id="attrs" pcid="{{result.pcid}}" cid="{{result.cid}}">
+                <div class="col-md-12">
+                    <h2>业务人员 属性标注<small style="margin-left: 10px;">PCID:{{result.pcid}} CID:{{result.cid}}</small></h2>
+                </div>
+               <div class="col-md-12" id="property-list">
+                   <ul class="nav nav-tabs nav-justified" id="myTab"> 
+                        <li role='presentation' class="active"><a href="#re" data-toggle="tab">产品相关</a></li>
+                        <li role='presentation'><a href="#irre" data-toggle="tab">产品不相关</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade in active" id="re">
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>ID</th>
+                                    <th>属性</th>
+                                    <th>推荐标注</th>
+                                    <th>样例句子</th>
+                                    <th>是否为有效属性</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in result.ir %}
+                                    <tr>
+                                        <th>{{ item.No }}</th>
+                                        <th>{{ item.id }}</th>
+                                        <th>{{ item.target }}</th>
+                                        <th>
+                                            <ul class="dowebok">
+                                                <li><input type="radio" name="radio_{{item.id}}" data-labelauty="{{item.top1class}}" checked="true" tag="{{item.top1class}}"></li>
+                                                {% if item.top2class %}
+                                                <li><input type="radio" name="radio_{{item.id}}" data-labelauty="{{item.top2class}}" tag="{{item.top2class}}"></li>
+                                                {% endif %}
+                                                <li><input type="radio" name="radio_{{item.id}}" data-labelauty="其他" tag="others" ><select class="mychecklist">
+                                                        <option value ="使用场景">使用场景</option>
+                                                        <option value ="适用人群">适用人群</option>
+                                                        <option value ="价格">价格</option>
+                                                        <option value ="服务">服务</option>
+                                                        <option value ="物流">物流</option>
+                                                        <option value ="品牌">品牌</option>
+                                                        <option value ="功能">功能</option>
+                                                        <option value ="质量">质量</option>
+                                                        <option value ="款式">款式</option>
+                                                        <option value ="活动">活动</option>
+                                                    </select>
+                                                </li>
+                                            </ul>
+                                        </th>
+                                        <th>    
+                                            <a tabindex="0" class="btn btn-primary" role="button" data-toggle="popover" data-trigger="focus" title="样例句子" data-content="{% for sen in item.sentences %} [ {{sen}} ] {% endfor %}">点击详情</a>
+                                        </th>
+                                        <th>
+                                            <ul class="dowebok">
+                                                <li><input type="radio" name="radio_{{item.id}}_iseffective" data-labelauty="有效" checked="true" tag="yes"></li>
+                                                <li><input type="radio" name="radio_{{item.id}}_iseffective" data-labelauty="无效" tag="no"></li>
+                                            </ul>
+                                        </th>
+                                     </tr>
+                                     {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tab-pane fade" id="irre">
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>ID</th>
+                                    <th>属性</th>
+                                    <th>推荐标注</th>
+                                    <th>样例句子</th>
+                                    <th>是否为有效属性</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in result.irre %}
+                                    <tr>
+                                        <th>{{ item.No }}</th>
+                                        <th>{{ item.id }}</th>
+                                        <th>{{ item.target }}</th>
+                                        <th>
+                                            <ul class="dowebok">
+                                                <li><input type="radio" name="radio_{{item.id}}" data-labelauty="{{item.top1class}}" checked="true" tag="{{item.top1class}}"></li>
+                                                {% if item.top2class %}
+                                                <li><input type="radio" name="radio_{{item.id}}" data-labelauty="{{item.top2class}}" tag="{{item.top2class}}"></li>
+                                                {% endif %}
+                                                <li><input type="radio" name="radio_{{item.id}}" data-labelauty="其他" tag="others" ><select class="mychecklist">
+                                                        <option value ="使用场景">使用场景</option>
+                                                        <option value ="适用人群">适用人群</option>
+                                                        <option value ="价格">价格</option>
+                                                        <option value ="服务">服务</option>
+                                                        <option value ="物流">物流</option>
+                                                        <option value ="品牌">品牌</option>
+                                                        <option value ="功能">功能</option>
+                                                        <option value ="质量">质量</option>
+                                                        <option value ="款式">款式</option>
+                                                        <option value ="活动">活动</option>
+                                                    </select>
+                                                </li>
+                                            </ul>
+                                        </th>
+                                        <th>
+                                            <a tabindex="0" class="btn btn-primary" role="button" data-toggle="popover" data-trigger="focus" title="样例句子" data-content="{% for sen in item.sentences %} [ {{sen}} ] {% endfor %}">点击详情</a>
+                                        </th>
+                                        <th>
+                                            <ul class="dowebok">
+                                                <li><input type="radio" name="radio_{{item.id}}_iseffective" data-labelauty="有效" checked="true" tag="yes"></li>
+                                                <li><input type="radio" name="radio_{{item.id}}_iseffective" data-labelauty="无效" tag="no"></li>
+                                            </ul>
+                                        </th>
+                                    </tr>
+                                     {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="alert alert-warning" role="alert" id="tip_message">请在确认全部属性（包括产品相关和产品不相关两类）完成标注后，点击提交按钮！</div>
+                        <div class="alert alert-info " role="alert" style="display: none;" id="doing_message">正在提交，不要关闭页面...</div>
+                        <div class="alert alert-success" role="alert" style="display: none;" id="done_message">恭喜你，已经完成提交！</div>
+                        <button type="button" class="btn btn-warning" id="submit">提交</button>
+                    </div>
+                </div>
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">提醒</h4>
+                      </div>
+                      <div class="modal-body">
+                        你确定提交全部属性标注（包括产品相关和产品不相关两类）?
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" id="do_action">继续</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+        </div>
+    </div>
+{% endblock %}
+{% block afterbody %}
+<style>
+ul { list-style-type: none;margin-bottom: 0px;}
+li { display: inline-block;}
+input.labelauty + label { display: inline-block; }
+th{text-align: center;}
+</style>
+<script type="text/javascript" src="{% static "js/plugin/jquery-labelauty.js" %}"></script>
+<script type="text/javascript" src="{% static "js/tagscheck.js" %}"></script>
+{% endblock afterbody %}

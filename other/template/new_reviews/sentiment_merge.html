@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% block header %}
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="container-fluid col-md-12" id="attrs" pcid="{{ pcid }}" cid="{{ cid }}">
+            <div class="col-md-12">
+                <h2>情感词合并
+                    <small style="margin-left: 10px;">PCID:{{ pcid }} CID:{{ cid }}</small>
+                </h2>
+            </div>
+            <div class="col-md-12" style="background-color: beige;margin-bottom: 15px;">
+                <h4>说明</h4>
+                <p>1、【整理】按钮会把替换词相同的行整理成连续的行，整体按替换词从小到大排序，替换词相同时按情感词排序</p>
+                <p>2、点击【提交】按钮只会提交当前主语下的所有记录</p>
+            </div>
+            <div class="col-md-10" id="property-list">
+                <div class="col-md-12">
+                    <div class="col-md-4">
+                        <select class="selectpicker" title="选择主语" id="target-list" data-style="btn-primary">
+                            <option>正在加载</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select id="commentDate" class="form-control">
+                            <option value="0">全部月份</option>
+                            {% for i in datamonth_list %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button id="refresh" type="button" class="btn btn-primary">整理</button>
+                    </div>
+                </div>
+                <div class="tab-pane fade in active">
+                    <table class="table table-striped" id="main-table">
+                        <thead>
+                        <tr>
+                            <th>target</th>
+                            <th>情感词</th>
+                            <th>替换词</th>
+                            <th style="width: 300px;">正负向</th>
+                            <th name="head-frequency-datamonth">月词频</th>
+                            <th>总词频</th>
+                            <th>规则来源</th>
+                            <th style="width: 60px;">全局</th>
+                            <th style="width: 60px;"></th>
+                        </tr>
+                        </thead>
+                        <!--表格元素模板-->
+                        <tr id="templateRow" style="display: none" target="" opinion="">
+                            <th name="target"></th>
+                            <th name="opinion"></th>
+                            <th>
+                                <div name="des">
+                                    <input type="text" list="browsers">
+                                    <datalist id="browsers">
+                                    </datalist>
+                                </div>
+                            </th>
+                            <th>
+                                <div>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="direct" value="1">正面
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="direct" value="-1">负面
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="direct" value="0">中立
+                                    </label>
+                                </div>
+                            </th>
+                            <th name="frequency-datamonth"></th>
+                            <th name="frequency"></th>
+                            <th name="rule"></th>
+                            <th>
+                                <div name="global">是</div>
+                                <input name="global" type="checkbox" class="btn btn-info"/>
+                            </th>
+                            <th>
+                                <button type="button" name="submit" class="btn btn-info">提交</button>
+                            </th>
+                        </tr>
+                        <tbody id="table-content">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-12">
+                    <div class="alert alert-warning" role="alert" id="tip_message">请再确定一次修改内容，点击提交按钮！</div>
+                    <div class="alert alert-info " role="alert" style="display: none;" id="doing_message">
+                        正在提交，不要关闭页面...
+                    </div>
+                    <div class="alert alert-success" role="alert" style="display: none;" id="done_message">恭喜你，已经完成提交！
+                    </div>
+                    <button type="button" class="btn btn-warning" id="submit">提交</button>
+                </div>
+            </div>
+            <div class="col-md-2" style="display: none">
+                <h2>所有情感词记录，加载页面时临时存储</h2>
+                <div id="sentiment">
+                    {% for target, opinions in result.items %}
+                        {% for opinion, attr in opinions.items %}
+                            <span target="{{ target }}" opinion="{{ opinion }}" grade="{{ attr.grade }}"
+                                  num="{{ attr.num }}" rule="{{ attr.rule }}" rule-record="{{ attr.rule_record }}"
+                                  num-datamonth="{{ attr.num_datamonth }}"
+                                  {% if attr.global %}global="global"{% endif %}
+                                  {% if attr.merge %}merge="{{ attr.merge }}"{% endif %}></span>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block afterbody %}
+    <style>
+        ul {
+            list-style-type: none;
+            margin-bottom: 0px;
+        }
+
+        li {
+            display: inline-block;
+        }
+
+        input.labelauty + label {
+            display: inline-block;
+        }
+
+        th {
+            text-align: center;
+        }
+    </style>
+    <script type="text/javascript" src="{% static "js/plugin/jquery-labelauty.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/sentiment_merge.js" %}?v=201902261026"></script>
+{% endblock afterbody %}

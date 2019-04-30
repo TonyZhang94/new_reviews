@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% block header %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/new_reviews.css" %}">
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="container-fluid col-md-12">
+            <div class="col-md-12" id="input-data">
+                <div class="col-md-3"><input type="text" class="form-control" placeholder="PCID" id="pcid"></div>
+                <div class="col-md-3"><input type="text" class="form-control" placeholder="CID" id="cid"></div>
+                <!--<div class="col-md-3"><input type="text" class="form-control" value="4" placeholder="PCID" id="pcid"></div>-->
+                <!--<div class="col-md-3"><input type="text" class="form-control" value="50012097" placeholder="CID" id="cid"></div>-->
+                <div class="col-md-1">
+                    <button class="btn btn-default" id="show-data">新的查询</button>
+                </div>
+            </div>
+            <div class="col-md-12" style="margin-top: 1em">
+                <div class="col-md-2">
+                    <button class="btn btn-default" id="show-synonym-global">全局近义词库维护</button>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-default" id="show-target-global">全局属性标注维护</button>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-default" id="show-sentiment-global">全局情感词库维护</button>
+                </div>
+            </div>
+            <div class="col-md-12" style="margin-top: 20px;"><h4>其他任务：</h4></div>
+            <div class="col-md-12">
+                <div class="col-md-1"><a class="btn btn-default" href="/reviews/opinions/">业务人员 观点标注</a></div>
+            </div>
+            {% if status == '1' %}
+                <div class="result row">
+                    {% if not result %}
+                        <div class="col-md-12 mycard">
+                            <div class="alert alert-warning" role="alert">该 pcid:{{ search_condition.pcid }}
+                                cid:{{ search_condition.cid }} 没有进行过文本分析! 点击下方创建任务按钮开始创建任务！
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-warning" id="create_state"
+                                        pcid='{{ search_condition.pcid }}' cid='{{ search_condition.cid }}'>创建任务
+                                </button>
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% for item in result %}
+                        <div class="col-md-12 mycard">
+                            <div class="col-md-12 mycard-head">
+                                <h3>
+                                    PCID:{{ item.pcid }} CID:{{ item.cid }}
+                                </h3>
+                                <p>上次完成时间：{{ item.lastfinishedtime }}
+                                    <small style="margin-left: 10px">
+                                        <button type="button" class="btn btn-warning" pcid="{{ item.pcid }}"
+                                                cid="{{ item.cid }}" id="open_reset_status_dialog">重置流程
+                                        </button>
+                                    </small>
+                                </p>
+                            </div>
+                            <div class="col-md-12 mycard-body">
+                                <div class="col-md-3">
+                                    <h4>第一步：预处理</h4>
+                                    <div>
+                                        {% if  item.step_1_status == "done" %}
+                                            <button type="button" class="btn btn-success text-step"
+                                                    state="{{ item.step_1_status }}" step="1" pcid="{{ item.pcid }}"
+                                                    cid="{{ item.cid }}">
+                                                已完成
+                                            </button>
+                                        {% elif  item.step_1_status == "doing" %}
+                                            <button type="button" class="btn btn-primary text-step"
+                                                    state="{{ item.step_1_status }}" step="1" pcid="{{ item.pcid }}"
+                                                    cid="{{ item.cid }}">
+                                                正在处理...
+                                            </button>
+                                        {% elif  item.step_1_status == "no" %}
+                                            <button type="button" class="btn btn-warning text-step"
+                                                    state="{{ item.step_1_status }}" step="1" pcid="{{ item.pcid }}"
+                                                    cid="{{ item.cid }}">
+                                                未完成
+                                            </button>
+                                        {% elif item.step_1_status == "go" %}
+                                            <button type="button" class="btn btn-primary text-step"
+                                                    state="{{ item.step_1_status }}" step="1" pcid="{{ item.pcid }}"
+                                                    cid="{{ item.cid }}" is_jump="0">
+                                                去完成
+                                            </button>
+                                            <button type="button" class="btn btn-default text-step"
+                                                    state="{{ item.step_1_status }}" step="1" pcid="{{ item.pcid }}"
+                                                    cid="{{ item.cid }}" is_jump="1">
+                                                跳过
+                                            </button>
+                                        {% endif %}
+
+                                    </div>
+                                    <div>{% if item.step_1_status == "doing" %}预估时间{% else %}完成时间：{% endif %}
+                                        {{ item.step_1_time }}
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <h4>第二步：提取属性</h4>
+                                    <div>
+                                        {% if  item.step_2_status == "done" %}
+                                            {% if item.step_2_cluster_status == 0 %}
+                                                <button type="button" class="btn btn-success text-step"
+                                                        state="{{ item.step_2_status }}" step="2" pcid="{{ item.pcid }}"
+                                                        cid="{{ item.cid }}">
+                                                    已完成
+                                                </button>
+                                                <button type="button" class="btn btn-primary text-step" state="go"
+                                                        step="2_2" pcid="{{ item.pcid }}" cid="{{ item.cid }}">
+                                                    修改
+                                                </button>
+                                            {% else %}
+                                                <button type="button" class="btn btn-warning text-step" state="go"
+                                                        step="2_1" pcid="{{ item.pcid }}" cid="{{ item.cid }}">
+                                                    需要处理文本聚类
+                                                </button>
+                                            {% endif %}
+                                        {% elif  item.step_2_status == "doing" %}
+                                            <button type="button" class="btn btn-primary text-step"
+                                                    state="{{ item.step_2_status }}" step="2" pcid="{{ item.pcid }}"
+                                                    cid="{{ item.cid }}">
+                                                正在处理...
+                                            </button>
+                                        {% elif  item.step_2_status == "no" %}
+                                            <button type="button" class="btn btn-warning text-step"
+                                                    state="{{ item.step_2_status }}" step="2" pcid="{{ item.pcid }}"
+                                                    cid="{{ item.cid }}">
+                                                未完成
+                                            </button>
+                                        {% elif item.step_2_status == "go" %}
+                                            <form class="form-horizontal">
+                                                <div class="form-group">
+                                                    <label for="cluster_alpha" class="col-sm-12">聚类参数（0-1之间的浮点数)</label>
+                                                    <div class="col-sm-12">
+                                                        <input type="text" class="form-control" id="cluster_alpha"
+                                                               placeholder="(例如:0.85)"
+                                                               value="0.6">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="feature_limit" class="col-sm-12">文本参数（整数）</label>
+                                                    <div class="col-sm-12">
+                                                        <input type="text" class="form-control" id="feature_limit"
+                                                               placeholder="(例如:10)"
+                                                               value="{{ item.step_2_feature_limit }}">
+                                                    </div>
+                                                </div>
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox" id="isclsuter"> 进行近义词聚类
+                                                    </label>
+                                                </div>
+                                            </form>
+                                            <button type="button" class="btn btn-primary text-step"
+                                                    state="{{ item.step_2_status }}" step="2" pcid="{{ item.pcid }}"
+                                                    cid="{{ item.cid }}" is_jump="0">
+                                                去完成
+                                            </button>
+                                            <button type="button" class="btn btn-default text-step"
+                                                    state="{{ item.step_2_status }}" step="2" pcid="{{ item.pcid }}"
+                                                    cid="{{ item.cid }}" is_jump="1">
+                                                跳过
+                                            </button>
+                                        {% endif %}
+
+                                    </div>
+                                    <div>{% if item.step_2_status == "doing" %}预估时间{% else %}完成时间：{% endif %}
+                                        {{ item.step_2_time }}
+                                    </div>
+{#                                    <div>#}
+{#                                        <button type="button" class="btn btn-success" pcid="{{ item.pcid }}"#}
+{#                                                cid="{{ item.cid }}" id="show-synonym">#}
+{#                                            修改品类近义词词库#}
+{#                                        </button>#}
+{#                                    </div>#}
+                                </div>
+                                <div class="col-md-3">
+                                    <h4>第三步：业务人员标注</h4>
+                                    <div>
+                                        {% if  item.step_3_status == "done" %}
+                                            <button type="button" class="btn btn-success text-step"
+                                                    state="{{ item.step_3_status }}" step="3" pcid="{{ item.pcid }}"
+                                                    cid="{{ item.cid }}">
+                                                已完成
+                                            </button>
+                                        {% elif  item.step_3_status == "doing" %}
+                                            <button type="button" class="btn btn-primary text-step"
+                                                    state="{{ item.step_3_status }}" step="3" pcid="{{ item.pcid }}"
+                                                    cid="{{ item.cid }}">
+                                                正在处理...
+                                            </button>
+                                        {% elif  item.step_3_status == "no" %}
+                                            <button type="button" class="btn btn-warning text-step"
+                                                    state="{{ item.step_3_status }}" step="3" pcid="{{ item.pcid }}"
+                                                    cid="{{ item.cid }}">
+                                                未完成
+                                            </button>
+                                        {% elif item.step_3_status == "go" %}
+                                            <button type="button" class="btn btn-primary text-step"
+                                                    state="{{ item.step_3_status }}" step="3" pcid="{{ item.pcid }}"
+                                                    cid="{{ item.cid }}" is_jump="0">
+                                                去完成
+                                            </button>
+                                            <button type="button" class="btn btn-default text-step"
+                                                    state="{{ item.step_3_status }}" step="3" pcid="{{ item.pcid }}"
+                                                    cid="{{ item.cid }}" is_jump="1">
+                                                跳过
+                                            </button>
+                                        {% endif %}
+
+                                    </div>
+                                    <div>完成时间：{{ item.step_3_time }}</div>
+                                    <div>
+                                        <button type="button" class="btn btn-success" pcid="{{ item.pcid }}"
+                                                cid="{{ item.cid }}" id="show-target">
+                                            修改品类属性标注词库
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <h4>第四步：终处理</h4>
+                                    <div>
+                                        {% if  item.step_4_status == "done" %}
+                                            <button type="button" class="btn btn-success text-step"
+                                                    state="{{ item.step_4_status }}" step="4" pcid="{{ item.pcid }}"
+                                                    cid="{{ item.cid }}">
+                                                已完成
+                                            </button>
+                                        {% elif  item.step_4_status == "doing" %}
+                                            <button type="button" class="btn btn-primary text-step"
+                                                    state="{{ item.step_4_status }}" step="4" pcid="{{ item.pcid }}"
+                                                    cid="{{ item.cid }}">
+                                                正在处理...
+                                            </button>
+                                        {% elif  item.step_4_status == "no" %}
+                                            <button type="button" class="btn btn-warning text-step"
+                                                    state="{{ item.step_4_status }}" step="4" pcid="{{ item.pcid }}"
+                                                    cid="{{ item.cid }}">
+                                                未完成
+                                            </button>
+                                        {% elif item.step_4_status == "go" %}
+                                            <button type="button" class="btn btn-primary text-step"
+                                                    state="{{ item.step_4_status }}" step="4" pcid="{{ item.pcid }}"
+                                                    cid="{{ item.cid }}" is_jump="0">
+                                                去完成
+                                            </button>
+                                            <button type="button" class="btn btn-default text-step"
+                                                    state="{{ item.step_4_status }}" step="4" pcid="{{ item.pcid }}"
+                                                    cid="{{ item.cid }}" is_jump="1">
+                                                跳过
+                                            </button>
+                                        {% endif %}
+
+                                    </div>
+                                    <div>{% if item.step_4_status == "doing" %}预估时间{% else %}完成时间：{% endif %}
+                                        {{ item.step_4_time }}
+                                    </div>
+                                    <div>
+                                        <button type="button" class="btn btn-success" pcid="{{ item.pcid }}"
+                                                cid="{{ item.cid }}" id="show-sentiment">
+                                            品类情感词合并
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% if status == '0' %}
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-info" role="alert" style="margin-top: 20px">请输入PCID和CID进行状态查询~~</div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel">提醒</h4>
+                        </div>
+                        <div class="modal-body">
+                            你确定要进行该操作?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button type="button" class="btn btn-primary" id="do_action">继续</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="alert">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="alert">提醒</h4>
+                        </div>
+                        <div class="modal-body">
+                            你确定要进行 [重置流程] 操作? 操作会重新重置选中CID 所有文本分析流程状态到未完成.
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button type="button" class="btn btn-primary" id="reset_status">继续</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block afterbody %}
+    <script type="text/javascript" src="{% static "js/new_reviews.js" %}?v=201901001046"></script>
+{% endblock afterbody %}

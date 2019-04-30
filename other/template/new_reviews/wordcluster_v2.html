@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% block header %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/wordclusters.css" %}">
+{% endblock %}
+{% block content %}
+    <div class="container-fluid col-md-12" id="attrs" pcid="{{ pcid }}" cid="{{ cid }}">
+        <div class="col-md-12" style="margin-top: 0;margin-bottom: 1%">
+            <a class="btn btn-info" role="button" href="/reviews/search/?pcid={{ pcid }}&cid={{ cid }}" style="margin-right: 1%">返回</a>
+            <h2 style="display: inline">聚类结果检查及合并
+                <small style="margin-left: 10px;">PCID:{{ pcid }} CID:{{ cid }}</small>
+            </h2>
+            <button type="button" class="btn btn-primary" id="submit">提交处理结果</button>
+            <div style="display: inline;margin-left: 1%">
+                <button type="button" id="clear-copy-word" class="btn btn-warning">
+                    当前复制的文本（点此删除）
+                </button>
+                ：
+                <span id="tipDiv" class="label label-default"></span>
+            </div>
+            <div style="float: right">
+                <label for="cluster_alpha">聚类参数（0-1之间的浮点数，值越大类内词相似度越大) </label>
+                <input type="text" id="cluster_alpha" placeholder="(例如:0.85)" value="{{ result.cluster_alpha }}">
+                <button type="button" class="btn btn-danger" id="clusterAgain">重新聚类</button>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="alert alert-info" role="alert" id="process" align="center">
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="col-md-7" style="padding: 0">
+                <div class="col-md-12 div-header" style="padding-bottom: 1%">
+                    <div class="col-md-3">已确认的相近词</div>
+                    <div class="col-md-4">待确认的相近词</div>
+                    <div class="col-md-2">替换词</div>
+                    <div class="col-md-2">
+                        全局近义词
+                    </div>
+                </div>
+                <div id="div-left" class="col-md-12 div-left" style="margin: 0;padding: 0">
+                    <div class="div-left-body" style="padding-bottom: 10%">
+                        {#                        <div class="col-md-12 div-left-item">#}
+                        {#                            <div class="col-md-3">#}
+                        {#                                <input type="text" value="" data-role="tagsinput" name="edit-src">#}
+                        {#                            </div>#}
+                        {#                            <div class="col-md-4">#}
+                        {#                                <input type="text" value="" data-role="tagsinput" name="src">#}
+                        {#                            </div>#}
+                        {#                            <div class="col-md-2">#}
+                        {#                                <input class="form-control" value="" style="width: 100%" name="des">#}
+                        {#                            </div>#}
+                        {#                            <div class="col-md-1">#}
+                        {#                                <div class="switch">#}
+                        {#                                    <input type="checkbox" name="global" checked data-on-text="开" data-off-text="关"/>#}
+                        {#                                </div>#}
+                        {#                            </div>#}
+                        {#                            <div class="col-md-2">#}
+                        {#                                <div class="btn-group" role="group" aria-label="op">#}
+                        {#                                    <button class="btn btn-danger" name="del"><i class="glyphicon glyphicon-remove"></i>#}
+                        {#                                    </button>#}
+                        {#                                    <button class="btn btn-primary" name="add"><i class="glyphicon glyphicon-plus"></i>#}
+                        {#                                    </button>#}
+                        {#                                </div>#}
+                        {#                            </div>#}
+                        {#                        </div>#}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="col-md-12">
+                    <div class="col-md-3">
+                        <input type="text" id="right-search" class="form-control" placeholder="搜索待选词">
+                    </div>
+                    <div class="col-md-2" style="padding: 0">
+                        <div class="input-group">
+                            <input type="number" id="frequency" class="form-control" placeholder="词频" title="删除词频小于等于该值的词">
+                            <span class="input-group-btn">
+                                <button class="btn btn-danger" id="del-low" type="button">删除</button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="alert alert-info" role="alert">
+                            双击待选词行后再点击待确认的相近词文本框可直接添加
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 div-header" style="padding-bottom: 1%">
+                    <div class="col-md-2">
+                        <strong id="label-word" name="label-sort">
+                            待选词
+                        </strong>
+                    </div>
+                    <div class="col-md-2">
+                        <strong id="label-frequency" name="label-sort">
+                            词频
+                        </strong>
+                    </div>
+                    <div class="col-md-7">
+                        <strong class="disabled">
+                            典型评价
+                        </strong>
+                    </div>
+                    <div class="col-md-1">
+                    </div>
+                </div>
+                <div id="div-right" class="col-md-12 div-right" style="margin: 0;padding: 0">
+                    <div class="div-right-body">
+                        {#                        <div class="col-md-12 div-right-item">#}
+                        {#                            <div class="col-md-2" name="word"></div>#}
+                        {#                            <div class="col-md-2" name="frequency"></div>#}
+                        {#                            <div class="col-md-8" name="comment"></div>#}
+                        {#                        </div>#}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block afterbody %}
+    <style>
+        ul {
+            list-style-type: none;
+            margin-bottom: 0;
+        }
+
+        li {
+            display: inline-block;
+        }
+
+        input.labelauty + label {
+            display: inline-block;
+        }
+
+        th {
+            text-align: center;
+        }
+    </style>
+    <script type="text/javascript" src="{% static "js/plugin/jquery-labelauty.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/words_cluster_v2.js" %}?v=20190129"></script>
+{% endblock afterbody %}

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% block header %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/reviews.css" %}">
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="container-fluid col-md-12" id="ax">
+                <div class="col-md-12">
+                    <h2>业务人员 观点标注</h2>
+                </div>
+                <div class="col-md-12">
+                     <div class="col-md-1"><button class="btn btn-default" id="delete_all">全部删除</button></div>
+                </div>
+               <div class="col-md-12" id="property-list">
+                    <div class="tab-pane fade in active" id="opinions">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>序号</th>
+                                <th>观点</th>
+                                <th>标注</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in result %}
+                                <tr>
+                                    <th>{{ item.No }}</th>
+                                    <th>{{ item.id }}</th>
+                                    <th>{{ item.opinion }}</th>
+                                    <th>
+                                        <ul class="dowebok">
+                                            <li><input type="radio" name="radio{{item.id}}" data-labelauty="正面" {% if item.sentiment == "1" %} checked="true" {% endif %} tag="1"></li>
+                                            <li><input type="radio" name="radio{{item.id}}" data-labelauty="负面" {% if item.sentiment == "-1" %} checked="true" {% endif %} tag="-1"></li>
+                                            <li><input type="radio" name="radio{{item.id}}" data-labelauty="删除" tag="delete">
+                                            </li>
+                                        </ul>
+                                    </th>
+                                 </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="alert alert-warning" role="alert" id="tip_message">请在确认全部属性（包括产品相关和产品不相关两类）完成标注后，点击提交按钮！</div>
+                        <div class="alert alert-info " role="alert" style="display: none;" id="doing_message">正在提交，不要关闭页面...</div>
+                        <div class="alert alert-success" role="alert" style="display: none;" id="done_message">恭喜你，已经完成提交！</div>
+                        <button type="button" class="btn btn-warning" id="submit">提交</button>
+                    </div>
+                </div>
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">提醒</h4>
+                      </div>
+                      <div class="modal-body">
+                        你确定提交全部观点标注?
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" id="do_action">继续</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+        </div>
+    </div>
+{% endblock %}
+{% block afterbody %}
+<style>
+ul { list-style-type: none;margin-bottom: 0px;}
+li { display: inline-block;}
+input.labelauty + label { display: inline-block; }
+th{text-align: center;}
+</style>
+<script type="text/javascript" src="{% static "js/plugin/jquery-labelauty.js" %}"></script>
+<script type="text/javascript" src="{% static "js/opinionscheck.js" %}"></script>
+{% endblock afterbody %}
