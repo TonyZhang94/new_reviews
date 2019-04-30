@@ -53,7 +53,11 @@ class OpinionExtraction(threading.Thread):
         try:
             self.limit = kwargs["limit"]
         except KeyError:
-            self.limit = FREQUENCY_LIMIT
+            self.limit = None
+        try:
+            self.threshold = kwargs["threshold"]
+        except KeyError:
+            self.threshold = WORD_NUM_THRESHOLD
 
         self.feature_frequency = dict()
         self.features = set()
@@ -126,6 +130,7 @@ class OpinionExtraction(threading.Thread):
                 text += words[inx]
             self.ml_text.setdefault(words[center], set()).add(text)
 
+        # 为什么会报错
         if opi and back and index - 1 >= 0 and words[index - 1] in self.adverse:
             word = words[index - 1] + words[index]
             if word not in self.opinions:
@@ -261,6 +266,21 @@ class OpinionExtraction(threading.Thread):
             for k, v in self.frequency_o.items():
                 print(k, v)
 
+    def make_threshold(self):
+        if self.limit is not None:
+            print("LIMIT Has Set", self.limit)
+            return
+        temp = list()
+        for tar, opis in self.frequency_t_o.items():
+            for opi, freq in opis.items():
+                temp.append([tar, opi, freq])
+        temp.sort(key=lambda x: x[2], reverse=True)
+        if len(temp) < self.threshold:
+            self.limit = 10
+        else:
+            self.limit = temp[self.threshold][2]
+        print("Set LIMIT", self.limit)
+
     def remove(self):
         for tar, opis in self.frequency_t_o.items():
             for opi, freq in opis.items():
@@ -363,6 +383,7 @@ class OpinionExtraction(threading.Thread):
         # self.O_Map = {}
         self.T_Seed = get_target_seed(self.pcid, self.cid)
 
+        self.make_threshold()
         self.remove()
         self.get_ml_text()
         self.add_new_adverse()
@@ -402,23 +423,38 @@ if __name__ == '__main__':
     
     之后：
     否定词
-    情感词到断点？
-    
+    ***public定义，2000个词上限                                                    待测试
     opi_neu，新词整理
+    后期操作修改的影响？情感词入库等，追加opi_xxx_new
     
+    情感词到断点？
     功能，质量，护理，速度，时间，之类的词进行拓展
-    后期操作修改的影响，增加字段？情感词入库等，追加opi_xxx_new
     
-    ***public定义，2000个词上限
-    
-    
-    TF-IDF
+    TF-IDF                                                                         晚上多跑几个品类cut_words
     ***TF
     
-    下周：
-    部署
-    
+    暂不考虑：
     tags的输入，和后面的结合
-    
     最后成功的提示
+    
+    第三次处理怎么进入第四次（除了处理入库），记录limit？
+    """
+
+    """
+    pcid0 其他 124086006 智能手表 95w
+    pcid1 游戏话费 125104012 农药代练 19w
+    pcid2 服装 50008898 卫衣 1965w 50008901 风衣 521w
+    pcid3 手机数码 110808 路由器 127w
+    pcid4 家用电器 50228001 音响 330w
+    pcid5 美妆美饰 都做过了??? 121474010 面膜 7000w 
+    pcid6 母婴用品 50012440 理发器 45w 50013857 推车配件 42w
+    pcid7 家居建材 121398012 窗帘轨道 36w 350615 接线板 300w
+    pcid8 百货用品 121454005 剃须刀 100w
+    pcid9 户外运动 50019775 电动平衡车 18w
+    pcid10 文化娱乐 50017524 蓝牙耳机 0.4w
+    pcid11 生活服务
+    pcid12 空
+    pcid13 汽配摩托 261712 车用氧吧/空气净化器 40w
+    
+    pcid100 特殊解决方式
     """

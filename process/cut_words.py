@@ -45,13 +45,13 @@ def get_comments(pcid, cid, dir_path):
         print("数据库读取评价")
         # os.makedirs(dir_path)
 
-        # table_src = 'raw_comment_pcid{}.raw_tb_comment{}'.format(pcid, cid)
-        # sql = "select itemid, comment_id, comment_all, comment_date from {} " \
-        #       "order by itemid Limit 10000".format(table_src)
-
         table_src = 'raw_comment_pcid{}.raw_tb_comment{}'.format(pcid, cid)
         sql = "select itemid, comment_id, comment_all, comment_date from {} " \
-              "order by itemid;".format(table_src)
+              "order by itemid Limit 10000".format(table_src)
+
+        # table_src = 'raw_comment_pcid{}.raw_tb_comment{}'.format(pcid, cid)
+        # sql = "select itemid, comment_id, comment_all, comment_date from {} " \
+        #       "order by itemid;".format(table_src)
 
         for df in pd.read_sql_query(
                 sql, engine("raw_tb_comment_notag"), chunksize=CUT_CHUNKSIZE):
@@ -136,11 +136,16 @@ def cut_words(pcid, cid):
         del result
         del sentences
 
+    all_frequency = 0
+    for _, freq in frequency.items():
+        all_frequency += freq
+    frequency["#总词频#"] = all_frequency
+
     if NEW_REVIEW_LOCAL:
         with open(f"{dir_path}frequency.pkl", mode="wb") as fp:
             pickle.dump(frequency, fp)
     else:
-        sql = f"TRUNCATE table frequency.pcid{pcid}cid{cid};"
+        sql = f"DROP table frequency.pcid{pcid}cid{cid};"
         try:
             pd.read_sql(sql, engine("lexicon"))
             print("清空frequency数据")
@@ -172,8 +177,8 @@ def print_time(msg, START):
 
 
 if __name__ == '__main__':
-    # pcid, cid = "4", "50012097"
-    pcid, cid = "4", "50228001"
+    pcid, cid = "4", "50012097"
+    # pcid, cid = "4", "50228001"
     START = datetime.datetime.now()
     print("begin", START)
     cut_words(pcid, cid)
