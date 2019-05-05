@@ -365,7 +365,7 @@ if __name__ == '__main__':
     obj = GetLexicon()
     obj.read_all("4")
     # obj.show()
-    obj.find_word('原来')
+    obj.find_word('迷你')
     # print(obj.opinions["过细"])
     # obj.append_words(["天内", "作出评价"])
     # obj.append_opi([["辣鸡", -1]])
