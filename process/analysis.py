@@ -131,24 +131,24 @@ class OpinionExtraction(threading.Thread):
             self.ml_text.setdefault(words[center], set()).add(text)
 
         # 为什么会报错
-        if opi and back and index - 1 >= 0 and words[index - 1] in self.adverse:
-            word = words[index - 1] + words[index]
-            if word not in self.opinions:
-                print("要添加了！！！！")
-                if 1 == self.opinions[words[index]]:
-                    self.opinions[word] = -1
-                    self.new_adverse[word] = -1
-                elif -1 == self.opinions[words[index]]:
-                    self.opinions[word] = 1
-                    self.new_adverse[word] = 1
-                elif 0 == self.opinions[words[index]]:
-                    self.opinions[word] = 0
-                    self.new_adverse[word] = 0
-                elif 2 == self.opinions[words[index]]:
-                    self.opinions[word] = 2
-                    self.new_adverse[word] = 2
-                else:
-                    raise Exception("Unexpected Sentiment Orientation")
+        # if opi and back and index - 1 >= 0 and words[index - 1] in self.adverse:
+        #     word = words[index - 1] + words[index]
+        #     if word not in self.opinions:
+        #         print("要添加了！！！！")
+        #         if 1 == self.opinions[words[index]]:
+        #             self.opinions[word] = -1
+        #             self.new_adverse[word] = -1
+        #         elif -1 == self.opinions[words[index]]:
+        #             self.opinions[word] = 1
+        #             self.new_adverse[word] = 1
+        #         elif 0 == self.opinions[words[index]]:
+        #             self.opinions[word] = 0
+        #             self.new_adverse[word] = 0
+        #         elif 2 == self.opinions[words[index]]:
+        #             self.opinions[word] = 2
+        #             self.new_adverse[word] = 2
+        #         else:
+        #             raise Exception("Unexpected Sentiment Orientation")
 
         return opi
 
@@ -387,7 +387,7 @@ class OpinionExtraction(threading.Thread):
         self.remove()
         self.get_ml_text()
         self.add_new_adverse()
-        self.show()
+        # self.show()
         # 合并同义词
 
         # IsNoise = {word: True for word in self.frequency_t_o.keys()}
@@ -422,8 +422,7 @@ if __name__ == '__main__':
     记录时间(应该是自带的)
     
     之后：
-    否定词
-    ***public定义，2000个词上限                                                    待测试
+    ***否定词 为什么会报错
     opi_neu，新词整理
     后期操作修改的影响？情感词入库等，追加opi_xxx_new
     

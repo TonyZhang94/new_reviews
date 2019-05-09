@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from new_reviews.lexicon.lexicon import GetLexicon
+from new_reviews.process.inverse import Inverse
 from new_reviews.process.readDB import *
 
 
@@ -9,9 +10,48 @@ class Filter(object):
         lexicon = GetLexicon()
         lexicon.read_all(pcid)
         self.lex_words = lexicon.get_words()
+        self.keyno = lexicon.get_keyno()
         self.frequency = get_word_frequency(pcid, cid)
-
         self.noise = set()
+
+        self.targets_cid = self.get_target(pcid, cid)
+        self.useless_cid = self.get_useless(pcid, cid)
+        self.new_words = self.get_new_words(pcid, cid)
+
+    @staticmethod
+    def get_target(pcid, cid):
+        sql = f"SELECT DISTINCT target FROM public.targets WHERE pcid='{pcid}' and cid='{cid}';"
+        df = pd.read_sql(sql, con=engine("lexicon"))
+        print(f"targets {len(df)}")
+        return set(df["target"].values)
+
+    @staticmethod
+    def get_useless(pcid, cid):
+        sql = f"SELECT DISTINCT word FROM public.nomeaning WHERE pcid='{pcid}' and cid='{cid}';"
+        df = pd.read_sql(sql, con=engine("lexicon"))
+        print(f"no meanings {len(df)}")
+        return set(df["word"].values)
+
+    @staticmethod
+    def get_new_words(pcid, cid):
+        obj = Inverse(pcid, cid)
+        records = obj.get_inverse_result()
+        new_words = [record[0] for record in records]
+        print(f"new words {len(new_words)}")
+        return set(new_words)
+
+    def if_reserve(self, word):
+        if word in self.targets_cid:
+            return True
+        if word in self.useless_cid:
+            return False
+        if word in self.new_words:
+            return True
+        if word in self.lex_words:
+            return False
+        if word in self.noise:
+            return False
+        return True
 
     def parse(self, rows):
         data = list()
@@ -25,13 +65,17 @@ class Filter(object):
             record.append(list())
             record.append(list())
             indices = [k for k, v in enumerate(words)
-                       if v not in self.lex_words and v not in self.noise]
+                       if self.if_reserve(v)]
             for inx in indices:
                 flag = False
-                for ch in words[inx]:
-                    if ch < u'\u4e00' or u'\u9fff' < ch:
-                        flag = True
-                        break
+                if words[inx] not in self.targets_cid:
+                    for ch in words[inx]:
+                        if ch in self.keyno:
+                            flag = True
+                            break
+                        if ch < u'\u4e00' or u'\u9fff' < ch:
+                            flag = True
+                            break
                 if flag is True:
                     self.noise.add(words[inx])
                 else:

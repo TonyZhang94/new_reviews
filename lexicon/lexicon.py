@@ -37,6 +37,7 @@ class GetLexicon(object):
             "symbols",
             "vague",
             "vague_adv",
+            "vague_manu",
             "words",
             "words_manu",
 
@@ -188,6 +189,7 @@ class GetLexicon(object):
                     else:
                         # print(f"pcid{pcid}与其他pcid一致 {opi} {sen}")
                         pass
+        self.opinions[""] = 9
 
     def opinion_override_1(self, cur_pcid):
         # 建立 tar_opi
@@ -327,6 +329,9 @@ class GetLexicon(object):
     def get_adverse(self):
         return self.store["adverse"]
 
+    def get_keyno(self):
+        return self.store["keyno"]
+
     def find_word(self, word):
         print("找词", word)
         for file in self.store:
@@ -360,12 +365,27 @@ class GetLexicon(object):
             for word in neg:
                 fp.write(f"{word}\n")
 
+    def append_words_manu(self, words, sen=""):
+        if 0 == len(words):
+            return
+        name = {
+            -1: "opi_neg_manu.txt",
+            0: "opi_neu_manu.txt",
+            1: "opi_pos_manu.txt",
+            2: "vague_manu.txt",
+            "": "words_manu.txt"
+        }
+        with open(f"{self.path}{name[sen]}", mode="a", encoding="utf-8") as fp:
+            content = "\n".join(words) + "\n"
+            fp.write(content)
+
 
 if __name__ == '__main__':
     obj = GetLexicon()
-    obj.read_all("4")
+    obj.append_words_manu(["一", "二", "三"], 2)
+    # obj.read_all("4")
     # obj.show()
-    obj.find_word('迷你')
+    # obj.find_word('迷你')
     # print(obj.opinions["过细"])
     # obj.append_words(["天内", "作出评价"])
     # obj.append_opi([["辣鸡", -1]])

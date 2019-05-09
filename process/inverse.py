@@ -2,14 +2,21 @@
 
 
 from new_reviews.process.public import *
+from new_reviews.lexicon.lexicon import GetLexicon
 
 
 class Inverse(object):
-    def __init__(self, pcid, cid):
+    def __init__(self, pcid, cid, threshold_cmp=50, threshold_add=100, save=None):
         self.pcid = pcid
         self.cid = cid
+        self.threshold_cmp = threshold_cmp
+        self.threshold_add = threshold_add
+        self.save = save
 
-    def get_frequency(self, pcid, cid, limit=10):
+        self.chars = None
+        self.keyno = None
+
+    def get_frequency(self, pcid, cid, limit=50):
         sql = f"SELECT * FROM frequency.pcid{pcid}cid{cid} WHERE frequency > {limit};"
         df = pd.read_sql_query(sql, engine("lexicon"))
         words = set()
@@ -45,15 +52,32 @@ class Inverse(object):
 
             pcid100 特殊解决方式
         """
-        if "4" == self.pcid:
-            cmp_pcid = "2"
-            cmp_cid = ""
-        else:
-            cmp_pcid = "4"
-            cmp_cid = "50012097"
+        mapping = {
+            "0": ["2", "50008901"],
+            "1": ["2", "50008901"],
+            "2": ["4", "50228001"],
+            "3": ["2", "50008901"],
+            "4": ["2", "50008901"],
+            "5": ["4", "50228001"],
+            "6": ["4", "50228001"],
+            # "7": ["5", "121474010"],
+            "7": ["6", "50012440"],
+            "8": ["2", "50008901"],
+            "9": ["4", "50228001"],
+            "10": ["4", "50228001"],
+            "11": ["4", "50228001"],
+            "12": ["4", "50228001"],
+            "13": ["2", "50008901"],
+            "100": ["0", "124086006"]
+        }
+        try:
+            cmp_pcid, cmp_cid = mapping["pcid"]
+        except KeyError:
+            cmp_pcid, cmp_cid = "0", "124086006"
 
-        self.get_frequency(self.pcid, self.cid)
-        # self.get_frequency(cmp_pcid, cmp_cid)
+        words, words_freq = self.get_frequency(self.pcid, self.cid)
+        words_cmp, _ = self.get_frequency(cmp_pcid, cmp_cid, self.threshold_cmp)
+        return words-words_cmp, words_freq
 
     def search(self, method="DIFF"):
         if "DIFF" == method:
@@ -62,6 +86,52 @@ class Inverse(object):
             tf = self.TF()  # vector
             idf = self.IDF()  # vector
             return tf * idf
+
+    def get_ml_text(self):
+        sql = f"SELECT target, sentences FROM unsolved_targets WHERE pcid = '{self.pcid}' and cid = '{self.cid}';"
+        df = pd.read_sql(sql, con=engine("lexicon"))
+        ml_text = dict()
+        for k, v in df.iterrows():
+            ml_text[v["target"]] = v["sentences"]
+        return ml_text
+
+    def if_add(self, word, freq):
+        if freq < self.threshold_add:
+            return False
+        if word in self.chars:
+            return False
+        for char in list(word):
+            if char in self.keyno:
+                return False
+        return True
+
+    def get_inverse_result(self):
+        words, words_freq = self.DIFF()
+        records = list()
+        lexicon = GetLexicon()
+        lexicon.read_all(self.pcid)
+        self.chars = lexicon.get_chars()
+        self.keyno = lexicon.get_keyno()
+        # ml_text = self.get_ml_text()
+        for word in words:
+            if self.if_add(word, words_freq[word]):
+                # (100) target 默认
+                # (-1, 0, 1, 2, 9) opinion
+                # -100 无用词
+                # 0 局部 默认 1 全局
+                # records.append([word, ml_text[word], words_freq[word], 100, 0])
+                records.append([word, words_freq[word], 100, 0])
+        records.sort(key=lambda x: x[1], reverse=True)
+
+        if self.save is None:
+            self.save = int(len(words) * 0.04)
+            print("save set", self.save)
+        if self.save < len(records):
+            records = records[: self.save]
+        # for seq, record in enumerate(records, start=1):
+        #     print(seq, f": {record[0]} {record[1]}")
+
+        return records
 
 
 if __name__ == '__main__':
@@ -75,25 +145,27 @@ if __name__ == '__main__':
     
     STEP2
     方案一：
-    差集
+    DIFF
     
     方案二：
     TF-IDF
     """
-    pcid, cid = "4", "50012097"
+    pcid, cid = "2", "50008901"
+    # pcid, cid = "4", "50228001"
     obj = Inverse(pcid, cid)
-    words4, word2freq4 = obj.get_frequency("4", "50228001")
-    words2, word2freq2 = obj.get_frequency("2", "50008898", limit=50)
-
-    records = list()
-    diff42 = words4 - words2
-    for word in diff42:
-        records.append([word, word2freq4[word]])
-    records.sort(key=lambda x: x[1], reverse=True)
-
-    for seq, record in enumerate(records, start=1):
-        if record[1] > 500:
-            print(seq, f": {record[0]} {record[1]}")
+    obj.get_inverse_result()
+    # words4, word2freq4 = obj.get_frequency("4", "50228001")
+    # words2, word2freq2 = obj.get_frequency("2", "50008898", limit=50)
+    #
+    # records = list()
+    # diff42 = words4 - words2
+    # for word in diff42:
+    #     records.append([word, word2freq4[word]])
+    # records.sort(key=lambda x: x[1], reverse=True)
+    #
+    # for seq, record in enumerate(records, start=1):
+    #     if record[1] > 500:
+    #         print(seq, f": {record[0]} {record[1]}")
 
     """
     反向过滤发生在Filter之前，Filter __init__ 时候，过滤时把这些词放出来
