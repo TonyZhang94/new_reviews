@@ -6,7 +6,7 @@ from new_reviews.process.readDB import *
 
 
 class Filter(object):
-    def __init__(self, pcid, cid):
+    def __init__(self, pcid, cid, isStep2=False):
         lexicon = GetLexicon()
         lexicon.read_all(pcid)
         self.lex_words = lexicon.get_words()
@@ -16,7 +16,12 @@ class Filter(object):
 
         self.targets_cid = self.get_target(pcid, cid)
         self.useless_cid = self.get_useless(pcid, cid)
-        self.new_words = self.get_new_words(pcid, cid)
+        if isStep2:
+            print("is step2 new words set is considered")
+            self.new_words = self.get_new_words(pcid, cid)
+        else:
+            print("is step4 new words set is empty")
+            self.new_words = set()
 
     @staticmethod
     def get_target(pcid, cid):

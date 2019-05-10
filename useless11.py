@@ -35,7 +35,7 @@ with open("lexicon/opi_pos_pre.txt", mode="w", encoding="utf-8") as fp:
         fp.write(f"{word}\n")
 
 
-negs = ["太", "偏", "过"]
+negs = ["太", "偏", "过", "有点"]
 words = list()
 for key in keys:
     for neg in negs:

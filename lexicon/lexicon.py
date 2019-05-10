@@ -271,6 +271,7 @@ class GetLexicon(object):
                 else:
                     # print(f"cid 覆盖重写 {opi} {sen}， 原先 {self.opinions[opi]}")
                     self.opinions[opi] = sen
+        self.opinions[""] = 9
 
     def read_all(self, pcid):
         if self.store is not None:
@@ -382,10 +383,11 @@ class GetLexicon(object):
 
 if __name__ == '__main__':
     obj = GetLexicon()
-    obj.append_words_manu(["一", "二", "三"], 2)
-    # obj.read_all("4")
+    # obj.append_words_manu(["一", "二", "三"], 2)
+    obj.read_all("4")
     # obj.show()
-    # obj.find_word('迷你')
+    for word in obj.store["degree"]:
+        obj.find_word(word)
     # print(obj.opinions["过细"])
     # obj.append_words(["天内", "作出评价"])
     # obj.append_opi([["辣鸡", -1]])

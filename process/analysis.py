@@ -346,7 +346,7 @@ class OpinionExtraction(threading.Thread):
                 raise Exception("Unexpected Sentiment Orientation")
 
     def run(self):
-        model = Filter(self.pcid, self.cid)
+        model = Filter(self.pcid, self.cid, self.is_add)
         if not self.is_add:
             if STASFTRE:
                 make_result = self.make_result_not_add_stas
@@ -428,6 +428,7 @@ if __name__ == '__main__':
     
     情感词到断点？
     功能，质量，护理，速度，时间，之类的词进行拓展
+    防（水，盗，摔）
     
     TF-IDF                                                                         晚上多跑几个品类cut_words
     ***TF
