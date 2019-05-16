@@ -45,13 +45,13 @@ def get_comments(pcid, cid, dir_path):
         print("数据库读取评价")
         # os.makedirs(dir_path)
 
-        table_src = 'raw_comment_pcid{}.raw_tb_comment{}'.format(pcid, cid)
-        sql = "select itemid, comment_id, comment_all, comment_date from {} " \
-              "order by itemid Limit 10000".format(table_src)
-
         # table_src = 'raw_comment_pcid{}.raw_tb_comment{}'.format(pcid, cid)
         # sql = "select itemid, comment_id, comment_all, comment_date from {} " \
-        #       "order by itemid;".format(table_src)
+        #       "order by itemid Limit 10000".format(table_src)
+
+        table_src = 'raw_comment_pcid{}.raw_tb_comment{}'.format(pcid, cid)
+        sql = "select itemid, comment_id, comment_all, comment_date from {} " \
+              "order by itemid;".format(table_src)
 
         for df in pd.read_sql_query(
                 sql, engine("raw_tb_comment_notag"), chunksize=CUT_CHUNKSIZE):
@@ -156,9 +156,9 @@ def cut_words(pcid, cid):
 
         values = list()
         for k, v in frequency.items():
-            values.append([k, v])
+            values.append([k, v, v/all_frequency])
         values.sort(key=lambda x: x[1], reverse=True)
-        df = pd.DataFrame(values, columns=["word", "frequency"])
+        df = pd.DataFrame(values, columns=["word", "frequency", "share"])
         df.to_sql(f"pcid{pcid}cid{cid}", con=engine("lexicon"), schema="frequency", index=False, if_exists='append')
         print("frequency已存入数据库")
 
@@ -177,8 +177,9 @@ def print_time(msg, START):
 
 
 if __name__ == '__main__':
-    pcid, cid = "4", "50012097"
+    # pcid, cid = "4", "50012097"
     # pcid, cid = "4", "50228001"
+    pcid, cid = "100", "2018101516"
     START = datetime.datetime.now()
     print("begin", START)
     cut_words(pcid, cid)

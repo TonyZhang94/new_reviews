@@ -45,8 +45,8 @@ class Engine(object):
 
 engine = Engine()
 UTF8 = "utf_8_sig"
-NEW_REVIEW_LOCAL = True
-# NEW_REVIEW_LOCAL = False
+# NEW_REVIEW_LOCAL = True
+NEW_REVIEW_LOCAL = False
 FREQUENCY_LIMIT = 20
 WORD_NUM_THRESHOLD = 2000
 # STASFTRE = True
