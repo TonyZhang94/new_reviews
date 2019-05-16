@@ -113,6 +113,12 @@ class GetLexicon(object):
         for word in self.store["vague"]:
             self.opinions[word] = 2
 
+        for word in self.store["vague_adv"]:
+            self.opinions[word] = 2
+
+        for word in self.store["vague_manu"]:
+            self.opinions[word] = 2
+
         tasks = [["gopi_pos", 1], ["gopi_neu", 0], ["gopi_neg", -1]]
         for task in tasks:
             file, sen = task
@@ -194,6 +200,12 @@ class GetLexicon(object):
     def opinion_override_1(self, cur_pcid):
         # 建立 tar_opi
         for word in self.store["vague"]:
+            self.opinions[word] = 2
+
+        for word in self.store["vague_adv"]:
+            self.opinions[word] = 2
+
+        for word in self.store["vague_manu"]:
             self.opinions[word] = 2
 
         tasks = [["gopi_pos", 1], ["gopi_neu", 0], ["gopi_neg", -1]]
@@ -386,8 +398,9 @@ if __name__ == '__main__':
     # obj.append_words_manu(["一", "二", "三"], 2)
     obj.read_all("4")
     # obj.show()
-    for word in obj.store["degree"]:
-        obj.find_word(word)
+    obj.find_word("没有很紧")
+    # for word in obj.store["degree"]:
+    #     obj.find_word(word)
     # print(obj.opinions["过细"])
     # obj.append_words(["天内", "作出评价"])
     # obj.append_opi([["辣鸡", -1]])

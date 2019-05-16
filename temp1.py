@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-2019/04/21
+2019/05/16
 frequency表增加share字段
 """
 
@@ -34,20 +34,22 @@ def execute(tasks):
 if __name__ == '__main__':
     tasks = list()
     # tasks.append("pcid0cid124086006")
-    tasks.append("pcid1cid125104012")
-    tasks.append("pcid2cid50008898")
-    tasks.append("pcid2cid50008901")
-    tasks.append("pcid3cid110808")
-    tasks.append("pcid4cid50012097")
-    tasks.append("pcid4cid50228001")
-    tasks.append("pcid6cid50012440")
-    tasks.append("pcid6cid50013857")
-    tasks.append("pcid7cid121398012")
-    tasks.append("pcid7cid350615")
-    tasks.append("pcid8cid121454005")
-    tasks.append("pcid9cid50019775")
-    tasks.append("pcid10cid50017524")
-    tasks.append("pcid13cid261712")
-    tasks.append("pcid100cid2018101516")
+    # tasks.append("pcid1cid125104012")
+    # tasks.append("pcid2cid50008898")
+    # tasks.append("pcid2cid50008901")
+    # tasks.append("pcid3cid110808")
+    # tasks.append("pcid4cid50012097")
+    # tasks.append("pcid4cid50228001")
+    # tasks.append("pcid6cid50012440")
+    # tasks.append("pcid6cid50013857")
+    # tasks.append("pcid7cid121398012")
+    # tasks.append("pcid7cid350615")
+    tasks.append("pcid7cid50006219")
+    # tasks.append("pcid8cid121454005")
+    # tasks.append("pcid9cid50019775")
+    # tasks.append("pcid10cid50017524")
+    # tasks.append("pcid13cid261712")
+    # tasks.append("pcid100cid2018101516")
+    tasks.append("pcid100cid2019012410")
 
     execute(tasks)

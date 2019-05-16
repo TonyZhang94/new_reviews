@@ -128,8 +128,8 @@ class Inverse(object):
             print("save set", self.save)
         if self.save < len(records):
             records = records[: self.save]
-        # for seq, record in enumerate(records, start=1):
-        #     print(seq, f": {record[0]} {record[1]}")
+        for seq, record in enumerate(records, start=1):
+            print(seq, f": {record[0]} {record[1]}")
 
         return records
 
@@ -150,8 +150,8 @@ if __name__ == '__main__':
     方案二：
     TF-IDF
     """
-    pcid, cid = "2", "50008901"
-    # pcid, cid = "4", "50228001"
+    # pcid, cid = "2", "50008901"
+    pcid, cid = "4", "50228001"
     obj = Inverse(pcid, cid)
     obj.get_inverse_result()
     # words4, word2freq4 = obj.get_frequency("4", "50228001")

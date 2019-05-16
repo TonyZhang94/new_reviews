@@ -48,10 +48,10 @@ class Filter(object):
     def if_reserve(self, word):
         if word in self.targets_cid:
             return True
-        if word in self.useless_cid:
-            return False
         if word in self.new_words:
             return True
+        if word in self.useless_cid:
+            return False
         if word in self.lex_words:
             return False
         if word in self.noise:
