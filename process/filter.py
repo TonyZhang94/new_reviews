@@ -95,8 +95,11 @@ class Filter(object):
 
     def save_noise(self, out=False):
         if out:
-            for x in self.noise:
-                print(x)
+            if out:
+                path = f"{NEW_REVIEW_PATH}/lexicon/"
+                with open(f"{path}noise.txt", mode="w", encoding="utf-8") as fp:
+                    for x in self.noise:
+                        fp.write(f"{x}\r\n")
         else:
             pass
 
