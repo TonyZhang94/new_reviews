@@ -76,7 +76,8 @@ class Filter(object):
                        if self.if_reserve(v)]
             for inx in indices:
                 flag = False
-                if words[inx] not in self.targets_cid and words[inx] not in self.new_words:
+                if words[inx] not in self.targets_cid and words[inx] not in self.new_words \
+                        and words[inx] not in self.comment_target:
                     for ch in words[inx]:
                         if ch in self.keyno:
                             flag = True

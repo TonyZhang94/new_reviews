@@ -74,18 +74,6 @@ class GetLexicon(object):
             "opi_pos_manu",
             "opi_pos_pre"
         ]
-        self.linux_file = [
-            "opi_neg_adv",
-            "opi_neu_adv",
-            "opi_pos_adv",
-            "vague_adv",
-            "opi_neg_manu",
-            "opi_neu_manu",
-            "opi_pos_manu",
-            "vague_manu",
-            "words_manu",
-            "comment_not_target"
-        ]
 
         self.store = None
         self.words = None
@@ -95,10 +83,6 @@ class GetLexicon(object):
         self.bounder = None
 
         self.path = f"{NEW_REVIEW_PATH}/lexicon/"
-
-        for file in self.linux_file:
-            with open(f"{self.path}{file}.txt", mode="a+", encoding="utf-8") as fp:
-                pass
 
     def read(self, file):
         self.store[file] = set()
@@ -439,23 +423,6 @@ class GetLexicon(object):
             content = "\r\n".join(words) + "\r\n"
             fp.write(content)
 
-    def change_linue_rn(self):
-        files = copy.copy(self.words_files)
-        files.append("comment_opinion_withFreq")
-        files.append("comment_target")
-        files.append("comment_target_withFreq")
-        # 缺 运行日志，lexicon，find
-
-        for file in files:
-            records = list()
-            with open(f"{self.path}{file}.txt", mode="r", encoding="utf-8") as fp:
-                for line in fp.readlines():
-                    records.append(line.strip())
-
-            with open(f"{self.path}{file}.txt", mode="w", encoding="utf-8") as fp:
-                for record in records:
-                    fp.write(f"{record}\r\n")
-
 
 if __name__ == '__main__':
     obj = GetLexicon()
@@ -464,7 +431,6 @@ if __name__ == '__main__':
     # comment_target = obj.get_comment_target()
     # for rank, line in enumerate(comment_target, start=1):
     #     print(rank, line)
-    obj.change_linue_rn()
     exit()
     # obj.find_word("精致")
     words = list()
