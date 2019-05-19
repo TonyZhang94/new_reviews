@@ -14,8 +14,8 @@ class GetLexicon(object):
 
     def __init__(self):
         self.words_files = [
-            "adverse_db",  # not real adverse
             "adverse",
+            "adverse_db",  # not real adverse
             "comment_not_target",
             "comment_opinion",
             "degree",
@@ -436,15 +436,37 @@ class GetLexicon(object):
             "": "words_manu.txt"
         }
         with open(f"{self.path}{name[sen]}", mode="a", encoding="utf-8") as fp:
-            content = "\n".join(words) + "\n"
+            content = "\r\n".join(words) + "\r\n"
             fp.write(content)
+
+    def change_linue_rn(self):
+        files = copy.copy(self.words_files)
+        files.append("comment_opinion_withFreq")
+        files.append("comment_target")
+        files.append("comment_target_withFreq")
+        # 缺 运行日志，lexicon，find
+
+        for file in files:
+            records = list()
+            with open(f"{self.path}{file}.txt", mode="r", encoding="utf-8") as fp:
+                for line in fp.readlines():
+                    records.append(line.strip())
+
+            with open(f"{self.path}{file}.txt", mode="w", encoding="utf-8") as fp:
+                for record in records:
+                    fp.write(f"{record}\r\n")
 
 
 if __name__ == '__main__':
     obj = GetLexicon()
     obj.read_all("4")
     # obj.show()
-    obj.find_word("精致")
+    # comment_target = obj.get_comment_target()
+    # for rank, line in enumerate(comment_target, start=1):
+    #     print(rank, line)
+    obj.change_linue_rn()
+    exit()
+    # obj.find_word("精致")
     words = list()
     with open("find.txt", mode="r", encoding="utf-8") as fp:
         for line in fp.readlines():
