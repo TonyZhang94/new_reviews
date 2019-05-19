@@ -58,11 +58,13 @@ if __name__ == '__main__':
     words = get_word_check_data(pcid=pcid, cid=cid, rules=rules)
 
     print("\ntype1")
+    has = set()
     rank = 0
     for word in words:
         if 1 == word[4]:
             rank += 1
             print(rank, word[0], word[1])
+        has.add(word[0])
 
     print("\ntype0")
     rank = 0
@@ -71,3 +73,14 @@ if __name__ == '__main__':
             rank += 1
             print(rank, word[0], word[1])
 
+    finds = list()
+    with open("../lexicon/find.txt", mode="r", encoding="utf-8") as fp:
+        for line in fp.readlines():
+            finds.append(line.strip())
+
+    print("\nnot find:")
+    rank = 0
+    for find in finds:
+        if find not in has:
+            rank += 1
+            print(rank, find)

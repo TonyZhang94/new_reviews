@@ -287,6 +287,13 @@ class GetLexicon(object):
                     self.opinions[opi] = sen
         self.opinions[""] = 9
 
+    def read_comment_target(self):
+        self.store["comment_target"] = set()
+        with open(f"{self.path}comment_target.txt", mode="r", encoding="utf-8") as fp:
+            for line in fp.readlines():
+                word = line.strip()
+                self.store["comment_target"].add(word)
+
     def read_all(self, pcid):
         if self.store is not None:
             print("Lexicon数据已有")
@@ -314,6 +321,8 @@ class GetLexicon(object):
         self.chars |= self.store["symbols"]
 
         self.bounder |= self.store["symbols"]
+
+        self.read_comment_target()
 
     def show(self):
         for file in self.store:
@@ -346,6 +355,9 @@ class GetLexicon(object):
 
     def get_keyno(self):
         return self.store["keyno"]
+
+    def get_comment_target(self):
+        return self.store["comment_target"]
 
     def find_word(self, word):
         print("找词", word)

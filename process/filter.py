@@ -11,6 +11,7 @@ class Filter(object):
         lexicon.read_all(pcid)
         self.lex_words = lexicon.get_words()
         self.keyno = lexicon.get_keyno()
+        self.comment_target = lexicon.get_comment_target()
         self.frequency = get_word_frequency(pcid, cid)
         self.noise = set()
 
@@ -49,6 +50,8 @@ class Filter(object):
         if word in self.targets_cid:
             return True
         if word in self.new_words:
+            return True
+        if word in self.comment_target:
             return True
         if word in self.useless_cid:
             return False
