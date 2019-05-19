@@ -282,6 +282,8 @@ class OpinionExtraction(threading.Thread):
 
     def remove(self):
         for tar, opis in self.frequency_t_o.items():
+            if "质量" == tar:
+                print("there has 质量")
             for opi, freq in opis.items():
                 if freq < self.limit:
                     self.omit.setdefault(tar, set()).add(opi)
@@ -307,6 +309,10 @@ class OpinionExtraction(threading.Thread):
                 del self.feature_frequency[itemid]
         del feature_frequency_bak
 
+        for tar, opis in self.frequency_t_o.items():
+            if "质量" == tar:
+                print("剩下1 质量")
+
         for itemid, records in self.NewDBData.items():
             for record in records:
                 if record[3] not in self.omit:
@@ -317,6 +323,11 @@ class OpinionExtraction(threading.Thread):
                     # print("删除记录", record)
                     pass
         del self.NewDBData
+
+        for itemid, records in self.NewDBData_Filtered.items():
+            for record in records:
+                if "质量" == record[3]:
+                    print("剩下2 质量")
 
     def get_ml_text(self):
         size = 10
@@ -426,9 +437,13 @@ if __name__ == '__main__':
 
     通用
     先放开，后面写进 not_comment
+    通用词取评率大于1？2？，高坪的稍微看下
+    为什么会丢质量、包装这些
 
     2. 功能，质量，护理，速度，时间，之类的词进行拓展
     一个字的词合并
+    
+    界面写一个增加拼词，前还是后，两个文件
 
     3. 颜色词为target
 

@@ -99,3 +99,9 @@ class Filter(object):
                 print(x)
         else:
             pass
+
+
+if __name__ == '__main__':
+    obj = Filter(pcid="4", cid="50228001")
+    res = obj.if_reserve("质量")
+    print(res)
