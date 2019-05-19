@@ -14,7 +14,7 @@ class GetLexicon(object):
 
     def __init__(self):
         self.words_files = [
-            "adverse_db",
+            "adverse_db",  # not real adverse
             "adverse",
             "comment_not_target",
             "comment_opinion",
@@ -74,6 +74,18 @@ class GetLexicon(object):
             "opi_pos_manu",
             "opi_pos_pre"
         ]
+        self.linux_file = [
+            "opi_neg_adv",
+            "opi_neu_adv",
+            "opi_pos_adv",
+            "vague_adv",
+            "opi_neg_manu",
+            "opi_neu_manu",
+            "opi_pos_manu",
+            "vague_manu",
+            "words_manu",
+            "comment_not_target"
+        ]
 
         self.store = None
         self.words = None
@@ -83,6 +95,10 @@ class GetLexicon(object):
         self.bounder = None
 
         self.path = f"{NEW_REVIEW_PATH}/lexicon/"
+
+        for file in self.linux_file:
+            with open(f"{self.path}{file}.txt", mode="a+", encoding="utf-8") as fp:
+                pass
 
     def read(self, file):
         self.store[file] = set()
