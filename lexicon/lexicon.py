@@ -16,6 +16,8 @@ class GetLexicon(object):
         self.words_files = [
             "adverse_db",
             "adverse",
+            "comment_not_target",
+            "comment_opinion",
             "degree",
             "emji",
             "emji1",
@@ -351,6 +353,23 @@ class GetLexicon(object):
             if word in self.store[file]:
                 print(file)
 
+    def find_words(self, words):
+        # 找find.txt文件中的
+        result = dict()
+        for file in self.store:
+            for word in words:
+                if word in self.store[file]:
+                    result.setdefault(file, list()).append(word)
+        for word in words:
+            find = False
+            for k, v in result.items():
+                if word in v:
+                    find = True
+                    break
+            if not find:
+                result.setdefault("notFind", list()).append(word)
+        return result
+
     def append_words(self, words):
         with open(f"{self.path}words.txt", mode="a", encoding="utf-8") as fp:
             for word in words:
@@ -395,12 +414,16 @@ class GetLexicon(object):
 
 if __name__ == '__main__':
     obj = GetLexicon()
-    # obj.append_words_manu(["一", "二", "三"], 2)
     obj.read_all("4")
     # obj.show()
-    obj.find_word("没有很紧")
-    # for word in obj.store["degree"]:
-    #     obj.find_word(word)
+    obj.find_word("精致")
+    words = list()
+    with open("find.txt", mode="r", encoding="utf-8") as fp:
+        for line in fp.readlines():
+            words.append(line.strip())
+    result = obj.find_words(words)
+    for k, v in result.items():
+        print(k, len(v), v)
     # print(obj.opinions["过细"])
     # obj.append_words(["天内", "作出评价"])
     # obj.append_opi([["辣鸡", -1]])

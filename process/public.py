@@ -29,13 +29,23 @@ class Engine(object):
             # print("Find Existed Connection With", db, "...")
             return conn
         except KeyError:
-            print("Try Create Connection With DB", db, "...")
-            conn = sa.create_engine("postgresql://{USER}:{PASS}@{HOST}:{PORT}/{DB}".
-                                    format(USER=info.user,
-                                           PASS=info.password,
-                                           HOST=info.host,
-                                           PORT=info.port,
-                                           DB=info.DB[db]))
+            if "tb_comment_words" != db:
+                print("Try Create Connection With DB on 99", db, "...")
+                conn = sa.create_engine("postgresql://{USER}:{PASS}@{HOST}:{PORT}/{DB}".
+                                        format(USER=info.user,
+                                               PASS=info.password,
+                                               HOST=info.host,
+                                               PORT=info.port,
+                                               DB=info.DB[db]))
+            else:
+                print("Try Create Connection With DB on 114", db, "...")
+                conn = sa.create_engine("postgresql://{USER}:{PASS}@{HOST}:{PORT}/{DB}".
+                                        format(USER=info.user,
+                                               PASS=info.password,
+                                               # HOST="192.168.1.114",  # for use
+                                               HOST=info.host,  # for test
+                                               PORT=info.port,
+                                               DB=info.DB[db]))
             self.__class__.engines_pool[db] = conn
             return conn
 

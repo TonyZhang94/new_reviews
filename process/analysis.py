@@ -130,25 +130,24 @@ class OpinionExtraction(threading.Thread):
                 text += words[inx]
             self.ml_text.setdefault(words[center], set()).add(text)
 
-        # 为什么会报错
-        # if opi and back and index - 1 >= 0 and words[index - 1] in self.adverse:
-        #     word = words[index - 1] + words[index]
-        #     if word not in self.opinions:
-        #         print("要添加了！！！！")
-        #         if 1 == self.opinions[words[index]]:
-        #             self.opinions[word] = -1
-        #             self.new_adverse[word] = -1
-        #         elif -1 == self.opinions[words[index]]:
-        #             self.opinions[word] = 1
-        #             self.new_adverse[word] = 1
-        #         elif 0 == self.opinions[words[index]]:
-        #             self.opinions[word] = 0
-        #             self.new_adverse[word] = 0
-        #         elif 2 == self.opinions[words[index]]:
-        #             self.opinions[word] = 2
-        #             self.new_adverse[word] = 2
-        #         else:
-        #             raise Exception("Unexpected Sentiment Orientation")
+        if opi and back and index - 1 >= 0 and words[index - 1] in self.adverse:
+            word = words[index - 1] + words[index]
+            opi = word
+            if word not in self.opinions:
+                if 1 == self.opinions[words[index]]:
+                    self.opinions[word] = -1
+                    self.new_adverse[word] = -1
+                elif -1 == self.opinions[words[index]]:
+                    self.opinions[word] = 1
+                    self.new_adverse[word] = 1
+                elif 0 == self.opinions[words[index]]:
+                    self.opinions[word] = 0
+                    self.new_adverse[word] = 0
+                elif 2 == self.opinions[words[index]]:
+                    self.opinions[word] = 2
+                    self.new_adverse[word] = 2
+                else:
+                    raise Exception("Unexpected Sentiment Orientation")
 
         return opi
 
@@ -335,13 +334,13 @@ class OpinionExtraction(threading.Thread):
 
         for word, sen in self.new_adverse.items():
             if 1 == sen:
-                pos.write(f"{word}\n")
+                pos.write(f"{word}\r\n")
             elif 0 == sen:
-                neu.write(f"{word}\n")
+                neu.write(f"{word}\r\n")
             elif -1 == sen:
-                neg.write(f"{word}\n")
+                neg.write(f"{word}\r\n")
             elif 2 == sen:
-                vague.write(f"{word}\n")
+                vague.write(f"{word}\r\n")
             else:
                 raise Exception("Unexpected Sentiment Orientation")
 
@@ -419,27 +418,25 @@ class OpinionExtraction(threading.Thread):
 if __name__ == '__main__':
     pass
     """
-    记录时间(应该是自带的)
-    
     之后：
-    ***否定词 为什么会报错
+    
+    1. 通用词会漏
     opi_neu，新词整理
-    后期操作修改的影响？情感词入库等，追加opi_xxx_new
     
-    情感词到断点？
-    功能，质量，护理，速度，时间，之类的词进行拓展
-    防（水，盗，摔）
+    通用
+    先放开，后面写进 not_comment
     
-    TF-IDF                                                                         晚上多跑几个品类cut_words
+    2. 功能，质量，护理，速度，时间，之类的词进行拓展
+    一个字的词合并
+    
+    3. 颜色词为target
+
+    4. TF-IDF                                                                         晚上多跑几个品类cut_words
     ***TF
-    
+
     暂不考虑：
-    tags的输入，和后面的结合
-    最后成功的提示
+    app，APP大小写问题
+    没有主语，迷你，小巧玲珑
     
-    第三次处理怎么进入第四次（除了处理入库），记录limit？
-    
-    没有主语，迷你
-    颜色
-    
+
     """
