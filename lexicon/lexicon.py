@@ -86,7 +86,7 @@ class GetLexicon(object):
 
     def read(self, file):
         self.store[file] = set()
-        with open(f"{self.path}{file}.txt", mode="r", encoding="utf-8") as fp:
+        with open(f"{self.path}{file}.txt", mode="a+", encoding="utf-8") as fp:
             for line in fp.readlines():
                 self.store[file].add(line.strip())
         self.words |= self.store[file]
@@ -100,7 +100,7 @@ class GetLexicon(object):
             sen = -1
         else:
             raise Exception("非法情感文件")
-        with open(f"{self.path}{file}.txt", mode="r", encoding="utf-8") as fp:
+        with open(f"{self.path}{file}.txt", mode="a+", encoding="utf-8") as fp:
             for line in fp.readlines():
                 word = line.strip()
                 if word in self.store["vague"]:
@@ -124,7 +124,7 @@ class GetLexicon(object):
         tasks = [["gopi_pos", 1], ["gopi_neu", 0], ["gopi_neg", -1]]
         for task in tasks:
             file, sen = task
-            with open(f"{self.path}{file}.txt", mode="r", encoding="utf-8") as fp:
+            with open(f"{self.path}{file}.txt", mode="a+", encoding="utf-8") as fp:
                 for line in fp.readlines():
                     word = line.strip()
                     if word not in self.opinions:
@@ -213,7 +213,7 @@ class GetLexicon(object):
         tasks = [["gopi_pos", 1], ["gopi_neu", 0], ["gopi_neg", -1]]
         for task in tasks:
             file, sen = task
-            with open(f"{self.path}{file}.txt", mode="r", encoding="utf-8") as fp:
+            with open(f"{self.path}{file}.txt", mode="a+", encoding="utf-8") as fp:
                 for line in fp.readlines():
                     word = line.strip()
                     if word not in self.opinions:

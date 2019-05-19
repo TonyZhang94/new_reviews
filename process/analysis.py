@@ -124,7 +124,7 @@ class OpinionExtraction(threading.Thread):
         index = inx
         if words[center] not in self.ml_text or len(self.ml_text[words[center]]) < 100:
             text = ""
-            for inx in range(center-3, center+4):
+            for inx in range(center - 3, center + 4):
                 if inx < 0 or inx >= len(words):
                     continue
                 text += words[inx]
@@ -327,12 +327,13 @@ class OpinionExtraction(threading.Thread):
                     break
 
     def add_new_adverse(self):
-        pos = open(f"{NEW_REVIEW_PATH}/lexicon/opi_pos_adv.txt", mode="a+", encoding="utf-8")
-        neu = open(f"{NEW_REVIEW_PATH}/lexicon/opi_neu_adv.txt", mode="a+", encoding="utf-8")
-        neg = open(f"{NEW_REVIEW_PATH}/lexicon/opi_neg_adv.txt", mode="a+", encoding="utf-8")
-        vague = open(f"{NEW_REVIEW_PATH}/lexicon/vague_adv.txt", mode="a+", encoding="utf-8")
+        pos = open(f"{NEW_REVIEW_PATH}/lexicon/opi_pos_adv.txt", mode="a", encoding="utf-8")
+        neu = open(f"{NEW_REVIEW_PATH}/lexicon/opi_neu_adv.txt", mode="a", encoding="utf-8")
+        neg = open(f"{NEW_REVIEW_PATH}/lexicon/opi_neg_adv.txt", mode="a", encoding="utf-8")
+        vague = open(f"{NEW_REVIEW_PATH}/lexicon/vague_adv.txt", mode="a", encoding="utf-8")
 
         for word, sen in self.new_adverse.items():
+            # print(f"write {word} {sen}")
             if 1 == sen:
                 pos.write(f"{word}\r\n")
             elif 0 == sen:
@@ -375,9 +376,9 @@ class OpinionExtraction(threading.Thread):
 
         model.save_noise()
 
-        # lexicon = GetLexicon()
-        # lexicon.read_all(self.pcid)
-        # self.opinions = lexicon.opinions
+        lexicon = GetLexicon()
+        lexicon.read_all(self.pcid)
+        self.opinions = lexicon.opinions
         # self.O_Seed = self.opinions
         # self.O_Map = {}
         self.T_Seed = get_target_seed(self.pcid, self.cid)
@@ -419,16 +420,16 @@ if __name__ == '__main__':
     pass
     """
     之后：
-    
+
     1. 通用词会漏
     opi_neu，新词整理
-    
+
     通用
     先放开，后面写进 not_comment
-    
+
     2. 功能，质量，护理，速度，时间，之类的词进行拓展
     一个字的词合并
-    
+
     3. 颜色词为target
 
     4. TF-IDF                                                                         晚上多跑几个品类cut_words
@@ -438,5 +439,8 @@ if __name__ == '__main__':
     app，APP大小写问题
     没有主语，迷你，小巧玲珑
     
+    其他：
+    adv是否不需要重新载入
+
 
     """
