@@ -393,6 +393,66 @@ class GetLexicon(object):
                 result.setdefault("notFind", list()).append(word)
         return result
 
+    def find_key_char(self):
+        chars = list()
+        chars.append("色")
+        chars.append("赤")
+        chars.append("红")
+        chars.append("朱")
+        chars.append("粉")
+        chars.append("橙")
+        chars.append("橘")
+        chars.append("黄")
+        chars.append("绿")
+        chars.append("青")
+        chars.append("蓝")
+        chars.append("靛")
+        chars.append("紫")
+        chars.append("黑")
+        chars.append("白")
+        chars.append("灰")
+        chars.append("金")
+        chars.append("银")
+        chars.append("深")
+        chars.append("墨")
+        chars.append("浅")
+        chars.append("淡")
+
+        print("颜色词有", len(chars), "个")
+        if len(set(chars)) != len(chars):
+            print("chars中有重复的")
+            return
+
+        files = copy.copy(self.words_files)
+        # files.append("comment_target")
+        files.append("target_opi")
+        print("find key char 有多少文件待查看", len(set(files)))
+        # 没有 lexicon.py，__init__.py，find，target_freq，opinion_freq
+
+        count = {char: 0 for char in chars}
+        for file in files:
+            print(f"\n{file}文件中:")
+            num = 0
+            with open(f"{self.path}{file}.txt", mode="r", encoding="utf-8") as fp:
+                for line in fp.readlines():
+                    word = line.strip()
+                    show = True
+                    for char in chars:
+                        if char in word:
+                            if show:
+                                num += 1
+                                print(word)
+                            show = False
+                            count[char] += 1
+            print(f"{file}文件中有{num}个颜色词")
+
+        print("\n统计：")
+        total = 0
+        for color, num in count.items():
+            print(color, num)
+            total += num
+        print("总计", total)
+
     def append_words(self, words):
         with open(f"{self.path}words.txt", mode="a", encoding="utf-8") as fp:
             for word in words:
@@ -468,13 +528,15 @@ if __name__ == '__main__':
     obj = GetLexicon()
     obj.read_all("4")
     # obj.show()
-    words = list()
-    with open("find.txt", mode="r", encoding="utf-8") as fp:
-        for line in fp.readlines():
-            words.append(line.strip())
-    result = obj.find_words(words)
-    for k, v in result.items():
-        print(k, len(v), v)
+
+    obj.find_key_char()
+    # words = list()
+    # with open("find.txt", mode="r", encoding="utf-8") as fp:
+    #     for line in fp.readlines():
+    #         words.append(line.strip())
+    # result = obj.find_words(words)
+    # for k, v in result.items():
+    #     print(k, len(v), v)
     # print(obj.opinions["过细"])
     # obj.append_words(["天内", "作出评价"])
     # obj.append_opi([["辣鸡", -1]])
