@@ -419,9 +419,38 @@ class GetLexicon(object):
             2: "vague_manu.txt",
             "": "words_manu.txt"
         }
+
         with open(f"{self.path}{name[sen]}", mode="a", encoding="utf-8") as fp:
             content = "\r\n".join(words) + "\r\n"
             fp.write(content)
+
+        not_target = set()
+
+        for word in words:
+            if word in self.store["comment_target"]:
+                not_target.add(word)
+
+        if 0 != len(not_target):
+            print("修改 common target")
+            print(not_target)
+
+            with open(f"{self.path}comment_not_target.txt", mode="a", encoding="utf-8") as fp:
+                for word in not_target:
+                    fp.write(f"{word}\r\n")
+
+            targets = list()
+            with open(f"{self.path}comment_target.txt", mode="r", encoding="utf-8") as fp:
+                for line in fp.readlines():
+                    word = line.strip()
+                    if word not in not_target:
+                        targets.append(word)
+
+            with open(f"{self.path}comment_target.txt", mode="w", encoding="utf-8") as fp:
+                for word in targets:
+                    fp.write(f"{word}\r\n")
+
+            del self.store["comment_target"]
+            self.read_comment_target()
 
 
 if __name__ == '__main__':

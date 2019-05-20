@@ -282,8 +282,6 @@ class OpinionExtraction(threading.Thread):
 
     def remove(self):
         for tar, opis in self.frequency_t_o.items():
-            if "质量" == tar:
-                print("there has 质量")
             for opi, freq in opis.items():
                 if freq < self.limit:
                     self.omit.setdefault(tar, set()).add(opi)
@@ -309,12 +307,10 @@ class OpinionExtraction(threading.Thread):
                 del self.feature_frequency[itemid]
         del feature_frequency_bak
 
-        for tar, opis in self.frequency_t_o.items():
-            if "质量" == tar:
-                print("剩下1 质量")
-
         for itemid, records in self.NewDBData.items():
             for record in records:
+                if "质量" == record[3]:
+                    print("剩下1 质量")
                 if record[3] not in self.omit:
                     self.NewDBData_Filtered.setdefault(itemid, list()).append(copy.copy(record))
                 elif record[2] not in self.omit[record[3]]:
@@ -436,13 +432,18 @@ if __name__ == '__main__':
     opi_neu，新词整理
 
     通用
-    先放开，后面写进 not_comment
+    后面写进 not_comment
+    为什么 word_manu写不进去？
+
     通用词取评率大于1？2？，高坪的稍微看下
-    为什么会丢质量、包装这些
+
+    颜色什么，小巧什么删删加加
+
+    第三部入库target？
 
     2. 功能，质量，护理，速度，时间，之类的词进行拓展
     一个字的词合并
-    
+
     界面写一个增加拼词，前还是后，两个文件
 
     3. 颜色词为target

@@ -67,7 +67,7 @@ def save_result(result, dir_path, table, rank):
         rank += 1
     else:
         print("运行环境，result结果保存至数据库")
-        result.to_sql(table.split(".")[1], con=engine("raw_tb_comment_notag"),
+        result.to_sql(table.split(".")[1], con=engine("tb_comment_words"),
                       schema=table.split(".")[0], if_exists='append', index=False, dtype=None)
 
 
@@ -75,7 +75,7 @@ def init_table(columns, table):
     if not NEW_REVIEW_LOCAL:
         print(f"初始化数据表{table}")
         df = pd.DataFrame(columns=columns)
-        df.to_sql(table.split(".")[1], con=engine("raw_tb_comment_notag"),
+        df.to_sql(table.split(".")[1], con=engine("tb_comment_words"),
                   schema=table.split(".")[0], if_exists='append', index=False, dtype=None)
         sql = "TRUNCATE table {};".format(table)
         try:

@@ -77,7 +77,7 @@ class Inverse(object):
 
         words, words_freq = self.get_frequency(self.pcid, self.cid)
         words_cmp, _ = self.get_frequency(cmp_pcid, cmp_cid, self.threshold_cmp)
-        return words-words_cmp, words_freq
+        return words - words_cmp, words_freq
 
     def search(self, method="DIFF"):
         if "DIFF" == method:
@@ -105,7 +105,7 @@ class Inverse(object):
                 return False
         return True
 
-    def get_inverse_result(self):
+    def get_inverse_result(self, show=False):
         words, words_freq = self.DIFF()
         records = list()
         lexicon = GetLexicon()
@@ -128,8 +128,10 @@ class Inverse(object):
             print("save set", self.save)
         if self.save < len(records):
             records = records[: self.save]
-        for seq, record in enumerate(records, start=1):
-            print(seq, f": {record[0]} {record[1]}")
+
+        if show:
+            for seq, record in enumerate(records, start=1):
+                print(seq, f": {record[0]} {record[1]}")
 
         return records
 
@@ -139,14 +141,14 @@ if __name__ == '__main__':
     STEP1
     方案一：
     cut后
-    
+
     方案二：
     filter后
-    
+
     STEP2
     方案一：
     DIFF
-    
+
     方案二：
     TF-IDF
     """
