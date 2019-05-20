@@ -13,6 +13,11 @@ class Filter(object):
         self.keyno = lexicon.get_keyno()
         self.comment_target = lexicon.get_comment_target()
         self.target_opi = lexicon.get_target_opi()
+        self.merge_front = lexicon.get_merge_front()
+        print("merge front:")
+        for word in self.merge_front:
+            print(word)
+        self.merge_back = lexicon.get_merge_back()
         self.frequency = get_word_frequency(pcid, cid)
         self.noise = set()
 
@@ -47,6 +52,46 @@ class Filter(object):
         print(f"new words {len(new_words)}")
         return set(new_words)
 
+    def merge_words(self, indices, words):
+        words_back = copy.copy(words)
+        new_indices, new_words = list(), list()
+        seq = 0  # indices
+        seq_offset = 0
+        rank = 0  # words
+        while True:
+            inx = indices[seq]
+            if rank < inx:
+                new_words.append(words[rank])
+                rank += 1
+                continue
+            if seq + 1 < len(indices) and indices[seq+1] == inx+1 and words[inx+1] in self.merge_front:
+                print("front合并", words[inx], words[inx+1])
+                new_indices.append(seq + seq_offset)
+                new_words.append(words[inx] + words[inx+1])
+                seq += 2
+                seq_offset -= 1
+                rank += 2
+            else:
+                new_indices.append(seq + seq_offset)
+                new_words.append(words[inx])
+                seq += 1
+                rank += 1
+            if seq >= len(indices):
+                break
+
+        # 合并后向
+        # for seq in range(len(indices)):
+        #     if words[inx] in self.merge_back and seq < len(indices)-1 and indices[seq+1] == inx+1:
+        #         print("合并", words[inx], words[inx+1])
+
+        # 一个字合并
+
+        if words_back != new_words:
+            print(new_words)
+            print(new_indices)
+
+        return new_indices, new_words
+
     def if_reserve(self, word):
         if word in self.targets_cid:
             return True
@@ -77,6 +122,7 @@ class Filter(object):
             record.append(list())
             indices = [k for k, v in enumerate(words)
                        if self.if_reserve(v)]
+            indices, words = self.merge_words(indices, words)
             for inx in indices:
                 flag = False
                 if words[inx] not in self.targets_cid and words[inx] not in self.new_words \

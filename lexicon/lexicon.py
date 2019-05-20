@@ -301,6 +301,19 @@ class GetLexicon(object):
                 word = line.strip()
                 self.store["target_opi"].add(word)
 
+    def read_merge_word(self):
+        self.store["merge_front"] = set()
+        with open(f"{self.path}merge_front.txt", mode="r", encoding="utf-8") as fp:
+            for line in fp.readlines():
+                word = line.strip()
+                self.store["merge_front"].add(word)
+
+        self.store["merge_back"] = set()
+        with open(f"{self.path}merge_back.txt", mode="r", encoding="utf-8") as fp:
+            for line in fp.readlines():
+                word = line.strip()
+                self.store["merge_back"].add(word)
+
     def read_all(self, pcid):
         if self.store is not None:
             print("Lexicon数据已有")
@@ -331,6 +344,7 @@ class GetLexicon(object):
 
         self.read_comment_target()
         self.read_target_opi()
+        self.read_merge_word()
 
     def show(self):
         for file in self.store:
@@ -369,6 +383,12 @@ class GetLexicon(object):
 
     def get_target_opi(self):
         return self.store["target_opi"]
+
+    def get_merge_front(self):
+        return self.store["merge_front"]
+
+    def get_merge_back(self):
+        return self.store["merge_back"]
 
     def find_word(self, word):
         print("找词", word)
