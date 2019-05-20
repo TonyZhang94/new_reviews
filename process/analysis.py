@@ -432,11 +432,9 @@ if __name__ == '__main__':
     opi_neu，新词整理
 
     通用
-    后面写进 not_comment
-    为什么 word_manu写不进去？
-
     通用词取评率大于1？2？，高坪的稍微看下
-
+    target, opinion, opi_neu 审核
+    
     颜色什么，小巧什么删删加加
 
     第三部入库target？
@@ -450,6 +448,8 @@ if __name__ == '__main__':
 
     4. TF-IDF                                                                         晚上多跑几个品类cut_words
     ***TF
+    英文缩写多提一些
+    提出的英文全部大写处理？（库里的英文全部变大写？）
 
     暂不考虑：
     app，APP大小写问题

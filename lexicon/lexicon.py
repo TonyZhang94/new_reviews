@@ -294,6 +294,13 @@ class GetLexicon(object):
                 word = line.strip()
                 self.store["comment_target"].add(word)
 
+    def read_target_opi(self):
+        self.store["target_opi"] = set()
+        with open(f"{self.path}target_opi.txt", mode="r", encoding="utf-8") as fp:
+            for line in fp.readlines():
+                word = line.strip()
+                self.store["target_opi"].add(word)
+
     def read_all(self, pcid):
         if self.store is not None:
             print("Lexicon数据已有")
@@ -358,6 +365,9 @@ class GetLexicon(object):
 
     def get_comment_target(self):
         return self.store["comment_target"]
+
+    def get_target_opi(self):
+        return self.store["target_opi"]
 
     def find_word(self, word):
         print("找词", word)
@@ -457,11 +467,6 @@ if __name__ == '__main__':
     obj = GetLexicon()
     obj.read_all("4")
     # obj.show()
-    # comment_target = obj.get_comment_target()
-    # for rank, line in enumerate(comment_target, start=1):
-    #     print(rank, line)
-    exit()
-    # obj.find_word("精致")
     words = list()
     with open("find.txt", mode="r", encoding="utf-8") as fp:
         for line in fp.readlines():

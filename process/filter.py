@@ -12,6 +12,7 @@ class Filter(object):
         self.lex_words = lexicon.get_words()
         self.keyno = lexicon.get_keyno()
         self.comment_target = lexicon.get_comment_target()
+        self.target_opi = lexicon.get_target_opi()
         self.frequency = get_word_frequency(pcid, cid)
         self.noise = set()
 
@@ -53,6 +54,8 @@ class Filter(object):
             return True
         if word in self.comment_target:
             return True
+        if word in self.target_opi:
+            return True
         if word in self.useless_cid:
             return False
         if word in self.lex_words:
@@ -77,7 +80,7 @@ class Filter(object):
             for inx in indices:
                 flag = False
                 if words[inx] not in self.targets_cid and words[inx] not in self.new_words \
-                        and words[inx] not in self.comment_target:
+                        and words[inx] not in self.comment_target and words[inx] not in self.target_opi:
                     for ch in words[inx]:
                         if ch in self.keyno:
                             flag = True

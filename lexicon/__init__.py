@@ -18,9 +18,12 @@ def delete_and_create_linxu_file():
     ]
 
     for file in linux_file:
-        os.remove(f"{file}.txt")
-        # with open(f"{file}.txt", mode="a+", encoding="utf-8") as fp:
-        #     pass
+        try:
+            os.remove(f"{file}.txt")
+        except FileNotFoundError:
+            pass
+        with open(f"{file}.txt", mode="a+", encoding="utf-8") as fp:
+            pass
 
 
 def change_n2rn():
@@ -72,7 +75,7 @@ def change_n2rn():
     files.append("comment_opinion_withFreq")
     files.append("comment_target")
     files.append("comment_target_withFreq")
-    # 缺 运行日志，lexicon，find
+    # 缺 运行日志，lexicon.py，__init.py__，find，target_opi
 
     for file in files:
         records = list()
@@ -87,4 +90,4 @@ def change_n2rn():
 
 if __name__ == '__main__':
     delete_and_create_linxu_file()
-    # change_n2rn()
+    change_n2rn()

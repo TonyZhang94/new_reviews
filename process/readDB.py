@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from analysis.script.utils import *
+# from analysis.script.utils import *
 
 from new_reviews.process.public import *
 from new_reviews.process.cut_words import SPLIT, base
