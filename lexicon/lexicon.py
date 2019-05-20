@@ -330,6 +330,7 @@ class GetLexicon(object):
         self.bounder |= self.store["symbols"]
 
         self.read_comment_target()
+        self.read_target_opi()
 
     def show(self):
         for file in self.store:
