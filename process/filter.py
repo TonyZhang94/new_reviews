@@ -59,25 +59,29 @@ class Filter(object):
         seq_offset = 0
         rank = 0  # words
         while True:
-            inx = indices[seq]
+            if rank == len(words):
+                break
+            try:
+                inx = indices[seq]
+            except IndexError:
+                inx = len(words)
+
             if rank < inx:
                 new_words.append(words[rank])
                 rank += 1
                 continue
             if seq + 1 < len(indices) and indices[seq+1] == inx+1 and words[inx+1] in self.merge_front:
                 print("front合并", words[inx], words[inx+1])
-                new_indices.append(seq + seq_offset)
+                new_indices.append(inx + seq_offset)
                 new_words.append(words[inx] + words[inx+1])
                 seq += 2
                 seq_offset -= 1
                 rank += 2
             else:
-                new_indices.append(seq + seq_offset)
+                new_indices.append(inx + seq_offset)
                 new_words.append(words[inx])
                 seq += 1
                 rank += 1
-            if seq >= len(indices):
-                break
 
         # 合并后向
         # for seq in range(len(indices)):
@@ -86,7 +90,8 @@ class Filter(object):
 
         # 一个字合并
 
-        if words_back != new_words:
+        if len(words_back) != len(new_words):
+            print(words_back)
             print(new_words)
             print(new_indices)
 
