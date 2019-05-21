@@ -14,9 +14,6 @@ class Filter(object):
         self.comment_target = lexicon.get_comment_target()
         self.target_opi = lexicon.get_target_opi()
         self.merge_front = lexicon.get_merge_front()
-        print("merge front:")
-        for word in self.merge_front:
-            print(word)
         self.merge_back = lexicon.get_merge_back()
         self.frequency = get_word_frequency(pcid, cid)
         self.noise = set()
@@ -53,7 +50,8 @@ class Filter(object):
         return set(new_words)
 
     def merge_words(self, indices, words):
-        words_back = copy.copy(words)
+        # 合并前向
+        # words_back = copy.copy(words)
         new_indices, new_words = list(), list()
         seq = 0  # indices
         seq_offset = 0
@@ -70,8 +68,8 @@ class Filter(object):
                 new_words.append(words[rank])
                 rank += 1
                 continue
-            if seq + 1 < len(indices) and indices[seq+1] == inx+1 and words[inx+1] in self.merge_front:
-                print("front合并", words[inx], words[inx+1])
+            if seq + 1 < len(indices) and indices[seq + 1] == inx + 1 and words[inx+1] in self.merge_front:
+                # print("front合并", words[inx], words[inx+1])
                 new_indices.append(inx + seq_offset)
                 new_words.append(words[inx] + words[inx+1])
                 seq += 2
@@ -89,11 +87,89 @@ class Filter(object):
         #         print("合并", words[inx], words[inx+1])
 
         # 一个字合并
+        indices, words = copy.copy(new_indices), copy.copy(new_words)
+        words_back = copy.copy(words)
+        del new_indices
+        del new_words
+        new_indices, new_words = list(), list()
+        new_indices_append, new_words_append = list(), list()
+        seq = 0  # indices
+        seq_offset = 0
+        rank = 0  # words
+        tail = len(words) - 1  # 末位下标
 
-        if len(words_back) != len(new_words):
-            print(words_back)
-            print(new_words)
-            print(new_indices)
+        while True:
+            if rank == len(words):
+                break
+            try:
+                inx = indices[seq]
+            except IndexError:
+                inx = len(words)
+
+            if rank < inx:
+                new_words.append(words[rank])
+                rank += 1
+                continue
+
+            # 逻辑2
+            # 单字合并后面的词
+            # 非单字合并后面的单字
+
+            # 逻辑1
+            if 1 == len(words[inx]):
+                # print("删除单字", words[inx])
+                if 0 < seq and indices[seq - 1] == inx - 1:
+                    # print("单字front合并", words[inx - 1], words[inx])
+                    start = max(0, inx - 4)
+                    end = min(len(words), inx + 4)
+                    new_words_append.append("#")
+                    tail += 1
+                    for i in range(start, end):
+                        if i == inx - 1:
+                            new_indices_append.append(tail + 1)
+                            new_words_append.append(words[inx - 1] + words[inx])
+                        elif i == inx:
+                            continue
+                        else:
+                            new_words_append.append(words[i])
+                        tail += 1
+
+                if seq + 1 < len(indices) and indices[seq + 1] == inx + 1:
+                    # print("单字back合并", words[inx], words[inx + 1])
+                    start = max(0, inx - 3)
+                    end = min(len(words), inx + 5)
+                    new_words_append.append("#")
+                    tail += 1
+                    for i in range(start, end):
+                        if i == inx:
+                            new_indices_append.append(tail + 1)
+                            new_words_append.append(words[inx] + words[inx + 1])
+                        elif i == inx + 1:
+                            continue
+                        else:
+                            new_words_append.append(words[i])
+                        tail += 1
+
+                new_words.append(words[inx])
+                seq += 1
+                seq_offset -= 1
+                rank += 1
+
+            else:
+                new_indices.append(inx + seq_offset)
+                new_words.append(words[inx])
+                seq += 1
+                rank += 1
+
+        new_indices.extend(new_indices_append)
+        new_words.extend(new_words_append)
+        # if len(words_back) != len(new_words):
+        #     print(words_back)
+        #     print(new_words)
+        #     print(new_indices)
+        #     print("merge:")
+        #     for inx in new_indices_append:
+        #         print(inx, new_words[inx])
 
         return new_indices, new_words
 
@@ -122,12 +198,14 @@ class Filter(object):
                 continue
             record = [row[0], row[1], row[4]]
             words = row[3].split(SPLIT)
-            record.append(words)
-            record.append(list())
-            record.append(list())
+
             indices = [k for k, v in enumerate(words)
                        if self.if_reserve(v)]
             indices, words = self.merge_words(indices, words)
+
+            record.append(words)
+            record.append(list())
+            record.append(list())
             for inx in indices:
                 flag = False
                 if words[inx] not in self.targets_cid and words[inx] not in self.new_words \
