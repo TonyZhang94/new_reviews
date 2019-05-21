@@ -548,15 +548,15 @@ if __name__ == '__main__':
     obj = GetLexicon()
     obj.read_all("4")
     # obj.show()
-    obj.find_word("很漂亮")  # nomeanings，comment_target
+    # obj.find_word("很漂亮")  # nomeanings，comment_target
     # obj.find_key_char()
-    # words = list()
-    # with open("find.txt", mode="r", encoding="utf-8") as fp:
-    #     for line in fp.readlines():
-    #         words.append(line.strip())
-    # result = obj.find_words(words)
-    # for k, v in result.items():
-    #     print(k, len(v), v)
+    words = list()
+    with open("find.txt", mode="r", encoding="utf-8") as fp:
+        for line in fp.readlines():
+            words.append(line.strip())
+    result = obj.find_words(words)
+    for k, v in result.items():
+        print(k, len(v), v)
     # print(obj.opinions["过细"])
     # obj.append_words(["天内", "作出评价"])
     # obj.append_opi([["辣鸡", -1]])
