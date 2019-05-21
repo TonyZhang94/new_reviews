@@ -65,6 +65,53 @@ def get_words(tasks):
             fp.write(f"{line[0]}\n")
 
 
+def find_conflict():
+    from new_reviews.lexicon.lexicon import GetLexicon
+    lexicon = GetLexicon()
+    lexicon.read_all(pcid="4")
+    useless = lexicon.get_words()
+    with open("comment_target.txt", mode="r", encoding="utf-8") as fp:
+        rank = 0
+        seq = 0
+        for line in fp.readlines():
+            rank += 1
+            word = line.strip()
+            if word in useless:
+            # if word not in useless:
+                seq += 1
+                print(rank, seq, word)
+
+
+def make_comment_target_by_freq(threshold=1):
+    from new_reviews.lexicon.lexicon import GetLexicon
+    lexicon = GetLexicon()
+    lexicon.read_all(pcid="4")
+    useless = lexicon.get_words()
+    targets = list()
+
+    special = set()
+    special.add("好")
+    special.add("不错")
+    special.add("不错呀")
+    special.add("双十一")
+    special.add("买一送一")
+    with open("comment_target_withFreq.txt", mode="r", encoding="utf-8") as fp:
+        for line in fp.readlines():
+            word, freq = line.strip().split()
+            if int(freq) > threshold or word not in useless:
+                if word in special:
+                    continue
+                targets.append(word)
+
+    with open("comment_target.txt", mode="w", encoding="utf-8") as fp:
+        content = "\n".join(targets) + "\n"
+        fp.write(content)
+
+
 if __name__ == '__main__':
-    tasks = get_tasks()
-    get_words(tasks)
+    # tasks = get_tasks()
+    # get_words(tasks)
+
+    # 下面两个函数需要放到lexicon文件夹内运行
+    # find_conflict()
+    make_comment_target_by_freq()

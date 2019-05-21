@@ -65,6 +65,37 @@ def get_words(tasks):
             fp.write(f"{line[0]}\n")
 
 
+def make_comment_opinion_by_freq(threshold=0):
+    opinions = list()
+
+    special = set()
+    special.add("小巧")
+    special.add("小巧玲珑")
+    special.add("迷你")
+    special.add("自动")
+    special.add("无线")
+    special.add("多功能")
+    special.add("轻巧")
+    special.add("家用")
+    special.add("迷你型")
+    with open("lexicon/comment_opinion_withFreq.txt", mode="r", encoding="utf-8") as fp:
+        for line in fp.readlines():
+            try:
+                word, freq = line.strip().split()
+            except ValueError:
+                print(line)
+                continue
+            if int(freq) > threshold:
+                if word in special:
+                    continue
+                opinions.append(word)
+
+    with open("lexicon/comment_opinion.txt", mode="w", encoding="utf-8") as fp:
+        content = "\n".join(opinions) + "\n"
+        fp.write(content)
+
+
 if __name__ == '__main__':
-    tasks = get_tasks()
-    get_words(tasks)
+    # tasks = get_tasks()
+    # get_words(tasks)
+    make_comment_opinion_by_freq()
