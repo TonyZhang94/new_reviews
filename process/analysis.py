@@ -464,5 +464,5 @@ if __name__ == '__main__':
     其他：
     adv是否不需要重新载入
 
-
+    frequency.pcid100cid2019012410 没字段
     """
