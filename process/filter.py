@@ -115,14 +115,13 @@ class Filter(object):
 
         # 一个字合并
         indices, words = copy.copy(new_indices), copy.copy(new_words)
-        indices_bak = copy.copy(indices)
-        words_bak = copy.copy(words)
+        # indices_bak = copy.copy(indices)
+        # words_bak = copy.copy(words)
         del new_indices
         del new_words
         new_indices, new_words = list(), list()
         new_indices_append, new_words_append = list(), list()
         seq = 0  # indices
-        # seq_offset = 0
         rank = 0  # words
         tail = len(words) - 1  # 末位下标
 
@@ -180,11 +179,9 @@ class Filter(object):
 
                 new_words.append(words[inx])
                 seq += 1
-                # seq_offset -= 1
                 rank += 1
 
             else:
-                # new_indices.append(inx + seq_offset)
                 new_indices.append(inx)
                 new_words.append(words[inx])
                 seq += 1
@@ -192,27 +189,6 @@ class Filter(object):
 
         new_indices.extend(new_indices_append)
         new_words.extend(new_words_append)
-
-        self.single_rank = 0
-        for inx in new_indices:
-            if 1 == len(new_words[inx]):
-                print("\n")
-                print(words_bak)
-                print(indices_bak)
-                print(new_words)
-                print(new_indices)
-                print(inx, new_words[inx])
-                self.single_rank += 1
-                if self.single_rank > 5:
-                    exit()
-
-        # if len(words_bak) != len(new_words):
-        #     print(words_back)
-        #     print(new_words)
-        #     print(new_indices)
-        #     print("merge:")
-        #     for inx in new_indices_append:
-        #         print(inx, new_words[inx])
 
         return new_indices, new_words
 
@@ -272,13 +248,6 @@ class Filter(object):
             indices = [k for k, v in enumerate(words)
                        if if_reserve(v)]
 
-            # indices, words = self.merge_words(indices, words)
-            # self.replace_synonym(words)
-
-            # record.append(words)
-            # record.append(list())
-            # record.append(list())
-
             temp_indices = list()
             for inx in indices:
                 flag = False
@@ -294,8 +263,6 @@ class Filter(object):
                 if flag is True:
                     self.noise.add(words[inx])
                 else:
-                    # record[4].append(words[inx])
-                    # record[5].append(inx)
                     temp_indices.append(inx)
 
             indices, words = self.merge_words(temp_indices, words)
@@ -320,5 +287,5 @@ class Filter(object):
 
 if __name__ == '__main__':
     obj = Filter(pcid="4", cid="50228001")
-    res = obj.if_reserve("质量")
+    res = obj.if_reserve_step2("质量")
     print(res)
