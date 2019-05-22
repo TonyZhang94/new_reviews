@@ -19,13 +19,17 @@ class Filter(object):
         self.noise = set()
 
         self.targets_cid = self.get_target(pcid, cid)
+        self.synonym = self.get_synonym(pcid, cid)
         self.useless_cid = self.get_useless(pcid, cid)
+        self.isStep2 = isStep2
         if isStep2:
             print("is step2 new words set is considered")
             self.new_words = self.get_new_words(pcid, cid)
         else:
-            print("is step4 new words set is empty")
-            self.new_words = set()
+            # print("is step4 new words set is empty")
+            # self.new_words = set()
+            print("is step4 new words set use to filter")
+            self.new_words = self.get_new_words(pcid, cid)
 
     @staticmethod
     def get_target(pcid, cid):
@@ -33,6 +37,29 @@ class Filter(object):
         df = pd.read_sql(sql, con=engine("lexicon"))
         print(f"targets {len(df)}")
         return set(df["target"].values)
+
+    @staticmethod
+    def get_synonym(pcid, cid):
+        synonym = dict()
+        sql = f"SELECT src_word, des_word FROM public.synonym_global;"
+        df = pd.read_sql(sql, con=engine("lexicon"))
+        len_global = len(df)
+        for k, v in df.iterrows():
+            synonym[v["src_word"]] = v["des_word"]
+        del df
+
+        sql = f"SELECT src_word, des_word FROM public.synonym WHERE pcid='{pcid}' and cid='{cid}';"
+        df = pd.read_sql(sql, con=engine("lexicon"))
+        len_cid = len(df)
+        for k, v in df.iterrows():
+            synonym[v["src_word"]] = v["des_word"]
+        del df
+
+        print("synonym global num:", len_global)
+        print("synonym cid num:", len_cid)
+        print("merge num:", len(synonym))
+
+        return synonym
 
     @staticmethod
     def get_useless(pcid, cid):
@@ -173,7 +200,7 @@ class Filter(object):
 
         return new_indices, new_words
 
-    def if_reserve(self, word):
+    def if_reserve_step2(self, word):
         if word in self.targets_cid:
             return True
         if word in self.new_words:
@@ -190,7 +217,33 @@ class Filter(object):
             return False
         return True
 
+    def if_reserve_step4(self, word):
+        if word in self.useless_cid:
+            return False
+        if word in self.targets_cid:
+            return True
+        if word in self.new_words:
+            return True
+        if word in self.comment_target:
+            return True
+        if word in self.target_opi:
+            return True
+        if word in self.lex_words:
+            return False
+        if word in self.noise:
+            return False
+        return True
+
+    def replace_synonym(self, words):
+        for inx in range(len(words)):
+            if words[inx] in self.synonym:
+                words[inx] = self.synonym[words[inx]]
+
     def parse(self, rows):
+        if self.isStep2:
+            if_reserve = self.if_reserve_step2
+        else:
+            if_reserve = self.if_reserve_step4
         data = list()
         for row in rows:
             if not row[3]:
@@ -200,8 +253,9 @@ class Filter(object):
             words = row[3].split(SPLIT)
 
             indices = [k for k, v in enumerate(words)
-                       if self.if_reserve(v)]
+                       if if_reserve(v)]
             indices, words = self.merge_words(indices, words)
+            self.replace_synonym(words)
 
             record.append(words)
             record.append(list())

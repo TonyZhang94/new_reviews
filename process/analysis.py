@@ -309,8 +309,6 @@ class OpinionExtraction(threading.Thread):
 
         for itemid, records in self.NewDBData.items():
             for record in records:
-                if "质量" == record[3]:
-                    print("剩下1 质量")
                 if record[3] not in self.omit:
                     self.NewDBData_Filtered.setdefault(itemid, list()).append(copy.copy(record))
                 elif record[2] not in self.omit[record[3]]:
@@ -320,10 +318,10 @@ class OpinionExtraction(threading.Thread):
                     pass
         del self.NewDBData
 
+        total = 0
         for itemid, records in self.NewDBData_Filtered.items():
-            for record in records:
-                if "质量" == record[3]:
-                    print("剩下2 质量")
+            total += len(records)
+        print("NewDBData 接口提供数据量", total)
 
     def get_ml_text(self):
         size = 10

@@ -84,3 +84,17 @@ if __name__ == '__main__':
         if find not in has:
             rank += 1
             print(rank, find)
+
+    print("\nSingle Char type1:")
+    rank = 0
+    for word in words:
+        if 1 == word[4] and 1 == len(word[0]):
+            rank += 1
+            print(rank, word[0], word[1])
+
+    print("\nSingle Char type0:")
+    rank = 0
+    for word in words:
+        if 0 == word[4] and 1 == len(word[0]):
+            rank += 1
+            print(rank, word[0], word[1])
