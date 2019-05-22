@@ -115,13 +115,14 @@ class Filter(object):
 
         # 一个字合并
         indices, words = copy.copy(new_indices), copy.copy(new_words)
-        words_back = copy.copy(words)
+        indices_bak = copy.copy(indices)
+        words_bak = copy.copy(words)
         del new_indices
         del new_words
         new_indices, new_words = list(), list()
         new_indices_append, new_words_append = list(), list()
         seq = 0  # indices
-        seq_offset = 0
+        # seq_offset = 0
         rank = 0  # words
         tail = len(words) - 1  # 末位下标
 
@@ -145,7 +146,7 @@ class Filter(object):
             # 逻辑1
             if 1 == len(words[inx]):
                 # print("删除单字", words[inx])
-                if 0 < seq and indices[seq - 1] == inx - 1:
+                if 0 < seq and indices[seq - 1] == inx - 1 and 1 != len(words[inx-1]):
                     # print("单字front合并", words[inx - 1], words[inx])
                     start = max(0, inx - 4)
                     end = min(len(words), inx + 4)
@@ -179,18 +180,33 @@ class Filter(object):
 
                 new_words.append(words[inx])
                 seq += 1
-                seq_offset -= 1
+                # seq_offset -= 1
                 rank += 1
 
             else:
-                new_indices.append(inx + seq_offset)
+                # new_indices.append(inx + seq_offset)
+                new_indices.append(inx)
                 new_words.append(words[inx])
                 seq += 1
                 rank += 1
 
         new_indices.extend(new_indices_append)
         new_words.extend(new_words_append)
-        # if len(words_back) != len(new_words):
+
+        self.single_rank = 0
+        for inx in new_indices:
+            if 1 == len(new_words[inx]):
+                print("\n")
+                print(words_bak)
+                print(indices_bak)
+                print(new_words)
+                print(new_indices)
+                print(inx, new_words[inx])
+                self.single_rank += 1
+                if self.single_rank > 5:
+                    exit()
+
+        # if len(words_bak) != len(new_words):
         #     print(words_back)
         #     print(new_words)
         #     print(new_indices)
@@ -252,14 +268,18 @@ class Filter(object):
             record = [row[0], row[1], row[4]]
             words = row[3].split(SPLIT)
 
+            self.replace_synonym(words)
             indices = [k for k, v in enumerate(words)
                        if if_reserve(v)]
-            indices, words = self.merge_words(indices, words)
-            self.replace_synonym(words)
 
-            record.append(words)
-            record.append(list())
-            record.append(list())
+            # indices, words = self.merge_words(indices, words)
+            # self.replace_synonym(words)
+
+            # record.append(words)
+            # record.append(list())
+            # record.append(list())
+
+            temp_indices = list()
             for inx in indices:
                 flag = False
                 if words[inx] not in self.targets_cid and words[inx] not in self.new_words \
@@ -274,8 +294,16 @@ class Filter(object):
                 if flag is True:
                     self.noise.add(words[inx])
                 else:
-                    record[4].append(words[inx])
-                    record[5].append(inx)
+                    # record[4].append(words[inx])
+                    # record[5].append(inx)
+                    temp_indices.append(inx)
+
+            indices, words = self.merge_words(temp_indices, words)
+            self.replace_synonym(words)
+
+            record.append(words)
+            record.append(list())  # targets 无用
+            record.append(indices)
             data.append(record)
         return data
 
