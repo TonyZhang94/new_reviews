@@ -425,24 +425,11 @@ if __name__ == '__main__':
     pass
     """
     之后：
+    1. 审核
+    target, opinion, opi_neu
 
-    1. 通用词会漏
-    opi_neu
-
-    通用
-    ***通用词取评率大于1？2？，高坪的稍微看下。一个字的删掉？
-    target, opinion, opi_neu 审核
-
-    第三部入库target？
-
-    2. 功能，质量，护理，速度，时间，之类的词进行拓展
-    一个字的词合并还有bug
-    后向的逻辑
-
-    界面写一个增加拼词，前还是后，两个文件
-
-    3. 颜色词为target
-    一些词未确定
+    2. 后向的逻辑
+    湖蓝色    
 
     coming：
     1. TF-IDF，多跑几个品类cut_words，只要frequency

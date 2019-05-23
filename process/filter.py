@@ -190,11 +190,6 @@ class Filter(object):
         new_indices.extend(new_indices_append)
         new_words.extend(new_words_append)
 
-        for inx in new_indices:
-            if "感觉湖" == new_words[inx]:
-                print(new_words)
-                print(new_indices)
-
         return new_indices, new_words
 
     def if_reserve_step2(self, word):
