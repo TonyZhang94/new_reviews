@@ -61,6 +61,9 @@ def get_target_seed(pcid, cid):
     # 品类属性词
     sql = "SELECT target,tag FROM targets WHERE pcid = '{}' and cid = '{}';".format(pcid, cid)
     df = pd.read_sql_query(sql, engine("lexicon"))
+    if df.empty:
+        sql = "SELECT target,top1class as tag FROM unsolved_targets WHERE pcid = '{}' and cid = '{}';".format(pcid, cid)
+        df = pd.read_sql_query(sql, engine("lexicon"))
     for k, v in df.iterrows():
         # if v["target"] in T_Seed:
         #     print("# target # 已有", v["target"])
