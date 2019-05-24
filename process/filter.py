@@ -78,7 +78,8 @@ class Filter(object):
 
     def merge_words(self, indices, words):
         # 合并前向
-        # words_back = copy.copy(words)
+        # indices_origin_bak = copy.copy(indices)
+        # words_origin_bak = copy.copy(words)
         new_indices, new_words = list(), list()
         seq = 0  # indices
         seq_offset = 0
@@ -109,14 +110,44 @@ class Filter(object):
                 rank += 1
 
         # 合并后向
-        # for seq in range(len(indices)):
-        #     if words[inx] in self.merge_back and seq < len(indices)-1 and indices[seq+1] == inx+1:
-        #         print("合并", words[inx], words[inx+1])
+        indices, words = copy.copy(new_indices), copy.copy(new_words)
+        # indices_front_bak = copy.copy(indices)
+        # words_front_bak = copy.copy(words)
+        del new_indices
+        del new_words
+        new_indices, new_words = list(), list()
+        seq = 0  # indices
+        seq_offset = 0
+        rank = 0  # words
+        while True:
+            if rank == len(words):
+                break
+            try:
+                inx = indices[seq]
+            except IndexError:
+                inx = len(words)
+
+            if rank < inx:
+                new_words.append(words[rank])
+                rank += 1
+                continue
+            if words[inx] in self.merge_back and seq + 1 < len(indices) and indices[seq + 1] == inx + 1:
+                # print("back合并", words[inx], words[inx+1])
+                new_indices.append(inx + seq_offset)
+                new_words.append(words[inx] + words[inx+1])
+                seq += 2
+                seq_offset -= 1
+                rank += 2
+            else:
+                new_indices.append(inx + seq_offset)
+                new_words.append(words[inx])
+                seq += 1
+                rank += 1
 
         # 一个字合并
         indices, words = copy.copy(new_indices), copy.copy(new_words)
-        # indices_bak = copy.copy(indices)
-        # words_bak = copy.copy(words)
+        # indices_back_bak = copy.copy(indices)
+        # words_back_bak = copy.copy(words)
         del new_indices
         del new_words
         new_indices, new_words = list(), list()

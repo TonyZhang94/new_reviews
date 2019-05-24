@@ -46,7 +46,8 @@ def get_init_info(pcid, cid):
     res = pd.read_sql(sql, con=engine("raw_tb_comment_notag"))
     num_comments = res["count"].values[0]
     print(f"Comments Num: {num_comments}")
-    print(f"Rounds:", (num_comments+CUT_CHUNKSIZE-1)//CUT_CHUNKSIZE)
+    rounds = num_comments+CUT_CHUNKSIZE-1)//CUT_CHUNKSIZE
+    print(f"Rounds:", rounds)
 
     num_words = -1
     try:
@@ -57,11 +58,11 @@ def get_init_info(pcid, cid):
     except Exception as e:
         # print("表不存在")
         pass
-    return num_comments, num_words
+    return num_comments, num_words, rounds
 
 
 def cut_words(pcid, cid):
-    num_comments, num_words = get_init_info(pcid, cid)
+    num_comments, num_words, rounds = get_init_info(pcid, cid)
     if -1 != num_words:
         return num_comments, num_words
     if 0 == num_comments:
@@ -88,6 +89,13 @@ def cut_words(pcid, cid):
 
         sentences = df.loc[df['is_useful'] != '', 'comment_all'].drop_duplicates().tolist()
         print('有效评价唯一数量：{}'.format(len(sentences)))
+
+        if 0 == len(sentences):
+            rank += 1
+            print(f"第 {rank}/{rounds} 轮没有有用评论，跳过")
+            print(f"第 {rank}/{rounds} 轮完成，each size={CUT_CHUNKSIZE}")
+            del sentences
+            continue
 
         result = map(cut, sentences)
         result = pd.concat(result, ignore_index=True)
@@ -190,3 +198,7 @@ def get_tasks():
 if __name__ == '__main__':
     tasks = get_tasks()
     execute(tasks)
+
+    # 2019-05-24
+    # 24轮 无有用评价异常
+    # pcid 5 cid 50010815 rank 1795/7913

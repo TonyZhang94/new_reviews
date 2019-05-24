@@ -118,6 +118,13 @@ def cut_words(pcid, cid):
         sentences = df.loc[df['is_useful'] != '', 'comment_all'].drop_duplicates().tolist()
         print('有效评价唯一数量：{}'.format(len(sentences)))
 
+        if 0 == len(sentences):
+            rank += 1
+            print(f"第{rank}轮没有有用评论，跳过")
+            print(f"第{rank}轮完成，each size={CUT_CHUNKSIZE}")
+            del sentences
+            continue
+
         # pool = multiprocessing.Pool(multiprocessing.cpu_count())
         # result = pool.map(cut, sentences)
         result = map(cut, sentences)

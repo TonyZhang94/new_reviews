@@ -75,7 +75,14 @@ def change_n2rn():
     files.append("comment_opinion_withFreq")
     files.append("comment_target")
     files.append("comment_target_withFreq")
-    # 缺 运行日志，lexicon.py，__init.py__，find，target_opi
+    files.append("merge_back")
+    files.append("merge_front")
+    files.append("target_opi")
+    files.append("find")
+    # 缺 运行日志，lexicon.py，__init.py__
+    # print(len(files))
+    # print(len(set(files)))
+    # exit()
 
     for file in files:
         records = list()

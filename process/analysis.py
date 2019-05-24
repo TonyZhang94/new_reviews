@@ -428,9 +428,6 @@ if __name__ == '__main__':
     1. 审核
     target, opinion, opi_neu
 
-    2. 后向的逻辑
-    湖蓝色    
-
     coming：
     1. TF-IDF，多跑几个品类cut_words，只要frequency
     ***TF
@@ -444,10 +441,10 @@ if __name__ == '__main__':
     4. biLSTM sa
     
     暂不考虑：
-    新的target情感词，e.g.迷你，小巧玲珑
-
-    其他：
+    新的target情感词，e.g.迷你，小巧玲珑（添加新词，直接操作文件）
+    新的合并关键词（添加新词，直接操作文件）
     adv是否不需要重新载入
-
+    
+    其他
     frequency.pcid100cid2019012410 没字段
     """
