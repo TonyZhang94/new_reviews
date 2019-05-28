@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 
+"""
+2019/05/24
+
+freq 数据库信息统计排序，人工挑use.txt
+"""
+
+
 import _pickle as pickle
 
 from new_reviews.process.public import *
@@ -71,21 +78,21 @@ def load_cidname():
 
 def make_result(warning_threshold1=1e5, warning_threshold2=5e3):
     pcids = list()
-    # pcids.append("0")
+    pcids.append("0")
     pcids.append("1")
     pcids.append("2")
     pcids.append("3")
     pcids.append("4")
-    # pcids.append("5")
-    # pcids.append("6")
-    # pcids.append("7")
-    # pcids.append("8")
-    # pcids.append("9")
-    # pcids.append("10")
-    # pcids.append("11")
-    # pcids.append("12")
-    # pcids.append("13")
-    # pcids.append("100")
+    pcids.append("5")
+    pcids.append("6")
+    pcids.append("7")
+    pcids.append("8")
+    pcids.append("9")
+    pcids.append("10")
+    pcids.append("11")
+    pcids.append("12")
+    pcids.append("13")
+    pcids.append("100")
 
     columns = ["pcid", "pcidname", "cid", "cidname", "cidtype", "comment_num", "word_num"]
     cidname = load_cidname()
@@ -102,7 +109,11 @@ def make_result(warning_threshold1=1e5, warning_threshold2=5e3):
                     records.append(copy.copy(record))
                 except KeyError:
                     if comment_num >= warning_threshold1 or word_num >= warning_threshold2:
-                        print("Not Find:", [pcid, cid, comment_num, word_num])
+                        if "100" == pcid:
+                            record = [pcid, "pcid100", cid, "pcid100cid", "cnid", comment_num, word_num]
+                            records.append(copy.copy(record))
+                        else:
+                            print("Not Find:", [pcid, cid, comment_num, word_num])
 
         df = pd.DataFrame(records, columns=columns)
         df = df.sort_values(["comment_num", "word_num"], ascending=False).reset_index(drop=True)

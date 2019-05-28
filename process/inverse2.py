@@ -17,153 +17,102 @@ class Inverse(object):
         self.keyno = None
 
     def get_frequency(self, pcid, cid, limit=50):
-        sql = f"SELECT * FROM frequency.pcid{pcid}cid{cid} WHERE frequency > {limit};"
-        df = pd.read_sql_query(sql, engine("lexicon"))
+        try:
+            df = pd.read_csv(f"pcid{pcid}cid{cid}.csv")
+            print("Read Local Data")
+        except FileNotFoundError:
+            print("Read Data From DB")
+            sql = f"SELECT * FROM frequency.pcid{pcid}cid{cid} WHERE frequency > {limit};"
+            df = pd.read_sql_query(sql, engine("lexicon"))
+            df.to_csv(f"pcid{pcid}cid{cid}.csv")
         words = set()
         word2freq = dict()
         for k, v in df.iterrows():
             if v["frequency"] > limit:
                 words.add(v["word"])
-                word2freq[v["word"]] = v["frequency"]
+                # word2freq[v["word"]] = v["frequency"]
+                word2freq[v["word"]] = [v["frequency"], v["share"]]
         return words, word2freq
 
     def TF(self):
-        return 0
+        _, words_tf = self.get_frequency(self.pcid, self.cid, 100)
+        return words_tf
 
     def IDF(self):
-        return 0
+        with open("../freq/freq_data/info_idf.pkl", mode="rb") as fp:
+            words_idf = pickle.load(fp)
+        return words_idf
 
-    def DIFF(self):
-        """
-            pcid0 其他 124086006 智能手表 95w
-            pcid1 游戏话费 125104012 农药代练 19w
-            pcid2 服装 50008898 卫衣 1965w 50008901 风衣 521w
-            pcid3 手机数码 110808 路由器 127w
-            pcid4 家用电器 50228001 音响 330w
-            pcid5 美妆美饰 都做过了??? 121474010 面膜 7000w
-            pcid6 母婴用品 50012440 理发器 45w 50013857 推车配件 42w
-            pcid7 家居建材 121398012 窗帘轨道 36w 350615 接线板 300w
-            pcid8 百货用品 121454005 剃须刀 100w
-            pcid9 户外运动 50019775 电动平衡车 18w
-            pcid10 文化娱乐 50017524 蓝牙耳机 0.4w
-            pcid11 生活服务
-            pcid12 空
-            pcid13 汽配摩托 261712 车用氧吧/空气净化器 40w
+    def cal_score(self):
+        words_tf = self.TF()
+        words_idf = self.IDF()
+        records = list()
+        records_not_find = list()
+        for word, record in words_tf.items():
+            freq, tf = record
+            if word not in words_idf:
+                # print(f"{word} not in idf")
+                records_not_find.append([word, tf, freq])
+                continue
+            records.append([word, tf/words_idf[word], freq])
 
-            pcid100 特殊解决方式
-        """
-        mapping = {
-            "0": ["2", "50008901"],
-            "1": ["2", "50008901"],
-            "2": ["4", "50228001"],
-            "3": ["2", "50008901"],
-            "4": ["2", "50008901"],
-            "5": ["4", "50228001"],
-            "6": ["4", "50228001"],
-            # "7": ["5", "121474010"],
-            "7": ["6", "50012440"],
-            "8": ["2", "50008901"],
-            "9": ["4", "50228001"],
-            "10": ["4", "50228001"],
-            "11": ["4", "50228001"],
-            "12": ["4", "50228001"],
-            "13": ["2", "50008901"],
-            "100": ["0", "124086006"]
-        }
-        try:
-            cmp_pcid, cmp_cid = mapping["pcid"]
-        except KeyError:
-            cmp_pcid, cmp_cid = "0", "124086006"
+        records.sort(key=lambda x: x[1], reverse=True)
+        records_not_find.sort(key=lambda x: x[1], reverse=True)
 
-        words, words_freq = self.get_frequency(self.pcid, self.cid)
-        words_cmp, _ = self.get_frequency(cmp_pcid, cmp_cid, self.threshold_cmp)
-        return words - words_cmp, words_freq
+        return records, records_not_find
 
     def search(self, method="DIFF"):
-        if "DIFF" == method:
-            self.DIFF()
-        else:
-            tf = self.TF()  # vector
-            idf = self.IDF()  # vector
-            return tf * idf
-
-    def get_ml_text(self):
-        sql = f"SELECT target, sentences FROM unsolved_targets WHERE pcid = '{self.pcid}' and cid = '{self.cid}';"
-        df = pd.read_sql(sql, con=engine("lexicon"))
-        ml_text = dict()
-        for k, v in df.iterrows():
-            ml_text[v["target"]] = v["sentences"]
-        return ml_text
+        pass
 
     def if_add(self, word, freq):
-        if freq < self.threshold_add:
-            return False
-        if word in self.chars:
-            return False
-        for char in list(word):
-            if char in self.keyno:
-                return False
-        return True
+        pass
 
-    def get_inverse_result(self, show=False):
-        words, words_freq = self.DIFF()
-        records = list()
-        lexicon = GetLexicon()
-        lexicon.read_all(self.pcid)
-        self.chars = lexicon.get_chars()
-        self.keyno = lexicon.get_keyno()
-        # ml_text = self.get_ml_text()
-        for word in words:
-            if self.if_add(word, words_freq[word]):
-                # (100) target 默认
-                # (-1, 0, 1, 2, 9) opinion
-                # -100 无用词
-                # 0 局部 默认 1 全局
-                # records.append([word, ml_text[word], words_freq[word], 100, 0])
-                records.append([word, words_freq[word], 100, 0])
-        records.sort(key=lambda x: x[1], reverse=True)
+    def get_inverse_result(self, top1=1000, top2=500, not_find_threshold={"freq": 1.5e-7, "cnt": 50}):
+        records, records_not_find = self.cal_score()
+        print("\nTop", top1)
+        for seq, record in enumerate(records, start=1):
+            print(seq, record[0], record[1], record[2])
+            if seq >= top1:
+                break
 
-        if self.save is None:
-            self.save = int(len(words) * 0.04)
-            print("save set", self.save)
-        if self.save < len(records):
-            records = records[: self.save]
-
-        if show:
-            for seq, record in enumerate(records, start=1):
-                print(seq, f": {record[0]} {record[1]}")
-
-        return records
+        print("\nNot Find:")
+        for seq, record in enumerate(records_not_find, start=1):
+            if not_find_threshold["freq"] > record[1] or not_find_threshold["cnt"] > record[2]:
+                break
+            print(seq, record[0], record[1], record[2])
+            if seq >= top2:
+                break
 
 
 if __name__ == '__main__':
     """
-    词内部权重TF 高 log 词频/总数
-    词外部权重IDF 低 log 词频/总数 加和 取排名靠前的
-    
-    的了着，符号去掉
-    
+    实际：
+    统计词频
     每个行业取10个/20个？1000w级别的cid
-    统计idf词频，计入表格
+    
+    一个cid和几个cid做差，然后比较
+    
+    最高的去掉不算推荐：的了着，通用target在comment_target里有，漏掉也无所谓
+    全都很低的不算
+    
+    ========================================= 算了
+    统计idf词频，计入本地，list保存，排名，排名百分比，词频百分比
+    =========================================
+    
+    理论：
+    选取多少个行业：7000+
+    
+    词内部权重TF 高 log 词频/总数，外部没有的词怎么办
+    词外部权重IDF 低 log 词频/总数 加和（为什么要取log，评价太多了，难保不相关词会出现，不同行业评价数量差异过大，用词频率表示）
+    
+    有一个高频停用词库，保证样本的高正确性
+    
+    加通用target
+    
+    挑一句话有多个target的，比例，多少字中有一个target（指标）
+    loss怎么定
     """
     # pcid, cid = "2", "50008901"
     pcid, cid = "4", "50228001"
     obj = Inverse(pcid, cid)
     obj.get_inverse_result()
-    # words4, word2freq4 = obj.get_frequency("4", "50228001")
-    # words2, word2freq2 = obj.get_frequency("2", "50008898", limit=50)
-    #
-    # records = list()
-    # diff42 = words4 - words2
-    # for word in diff42:
-    #     records.append([word, word2freq4[word]])
-    # records.sort(key=lambda x: x[1], reverse=True)
-    #
-    # for seq, record in enumerate(records, start=1):
-    #     if record[1] > 500:
-    #         print(seq, f": {record[0]} {record[1]}")
-
-    """
-    反向过滤发生在Filter之前，Filter __init__ 时候，过滤时把这些词放出来
-    一些确定噪声词还是要过滤掉：符号，keyno
-    """
