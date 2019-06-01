@@ -25,7 +25,7 @@ def get_cut_comments(pcid, cid, local=NEW_REVIEW_LOCAL):
         print("数据库读取cut结果")
         table = 'raw_comment_pcid{}.raw_tb_comment{}_cut_new'.format(pcid, cid)
         sql = f"SELECT * FROM {table} WHERE word != '' and word is not null;"
-        for df in pd.read_sql_query(sql, get_99_engine("tb_comment_words"), chunksize=ANA_CHUNKSIZE):
+        for df in pd.read_sql_query(sql, engine("tb_comment_words"), chunksize=ANA_CHUNKSIZE):
             yield df.values
 
 

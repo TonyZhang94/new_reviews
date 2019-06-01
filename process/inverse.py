@@ -155,7 +155,7 @@ if __name__ == '__main__':
     # pcid, cid = "2", "50008901"
     pcid, cid = "4", "50228001"
     obj = Inverse(pcid, cid)
-    obj.get_inverse_result()
+    obj.get_inverse_result(True)
     # words4, word2freq4 = obj.get_frequency("4", "50228001")
     # words2, word2freq2 = obj.get_frequency("2", "50008898", limit=50)
     #

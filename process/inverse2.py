@@ -56,7 +56,7 @@ class Inverse(object):
                 continue
             records.append([word, tf/words_idf[word], freq])
 
-        records.sort(key=lambda x: x[1], reverse=True)
+        records.sort(key=lambda x: x[2], reverse=True)
         records_not_find.sort(key=lambda x: x[1], reverse=True)
 
         return records, records_not_find
