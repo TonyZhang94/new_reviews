@@ -45,7 +45,7 @@ def get_word_frequency(pcid, cid, local=NEW_REVIEW_LOCAL):
         return frequency
 
 
-def get_target_seed(pcid, cid):
+def get_target_seed(pcid, cid, isStep2=False):
     # 全局属性词
     # sql = "SELECT target,tag FROM targets_global WHERE tag != 'delete';"
     # df = pd.read_sql_query(sql, engine("lexicon"))
@@ -61,7 +61,7 @@ def get_target_seed(pcid, cid):
     # 品类属性词
     sql = "SELECT target,tag FROM targets WHERE pcid = '{}' and cid = '{}';".format(pcid, cid)
     df = pd.read_sql_query(sql, engine("lexicon"))
-    if df.empty:
+    if isStep2 and df.empty:
         sql = "SELECT target,top1class as tag FROM unsolved_targets WHERE pcid = '{}' and cid = '{}';".format(pcid, cid)
         df = pd.read_sql_query(sql, engine("lexicon"))
     for k, v in df.iterrows():

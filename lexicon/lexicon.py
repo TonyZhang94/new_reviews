@@ -548,7 +548,7 @@ if __name__ == '__main__':
     obj = GetLexicon()
     obj.read_all("4")
     # obj.show()
-    obj.find_word("棒棒")
+    obj.find_word("黑头")
     exit()
     # obj.find_word("很漂亮")  # nomeanings，comment_target
     # obj.find_key_char()
