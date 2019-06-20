@@ -361,7 +361,7 @@ class OpinionExtraction(threading.Thread):
         # self.opinions = lexicon.opinions
         # self.O_Seed = self.opinions
         # self.O_Map = {}
-        self.T_Seed = get_target_seed(self.pcid, self.cid)
+        self.T_Seed = get_target_seed(self.pcid, self.cid, self.is_add)
 
         self.remove()
         self.get_ml_text()
